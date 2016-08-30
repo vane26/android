@@ -2,20 +2,23 @@ package com.google.sample.cloudvision.BD;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Created by Vane on 30/08/2016.
  */
 public class personaDbHelper extends SQLiteOpenHelper {
+    private static int VERSION = 1;
+    private static String DATA_BASE = "persona_db";
+    private static SQLiteDatabase.CursorFactory factory = null;
      String sqlUpdate = "ALTER TABLE personaContract.personaEntry ADD COLUMN run TEXT";
 
 
 
-    public personaDbHelper(Context context, String nombre, Cursor factory, int version){
-        super(context, nombre, factory, version);
+    public personaDbHelper(Context context){
+        super(context, DATA_BASE, factory, VERSION);
     }
 
 
@@ -34,6 +37,7 @@ public class personaDbHelper extends SQLiteOpenHelper {
                 + personaContract.personaEntry.APELLIDOS + " TEXT NOT NULL,"
                 + personaContract.personaEntry.NOMBRES + " TEXT NOT NULL,"
                 + "UNIQUE (" + personaContract.personaEntry.RUN + "))");
+         Log.i(this.getClass().toString(), "Tabla persona creada");
 
      }
 

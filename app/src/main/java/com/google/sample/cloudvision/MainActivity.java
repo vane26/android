@@ -37,6 +37,7 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
+import com.google.sample.cloudvision.BD.persona;
 import com.google.sample.cloudvision.BD.personaDbHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -91,8 +92,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         //abrimos la base de datos
-        personaDbHelper persona = new personaDbHelper(this, "db_persona", null, 1);
+        personaDbHelper persona = new personaDbHelper(getBaseContext());
         SQLiteDatabase sqLiteDatabase= persona.getWritableDatabase();
+        Toast.makeText(getBaseContext(), "Base de datos preparada", Toast.LENGTH_LONG).show();
 
         // si hemos abierto la base de datos de forma correcta
 
@@ -104,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                 String run = "Persona"+i;
 
                 //isertando los datos a la tabla persona
-                sqLiteDatabase.execSQL("INSERT INTO persona (codigo, run) "+
+                sqLiteDatabase.execSQL("agregar INTO persona (codigo, run) "+
                                     "VALUES ("+ codigo + ", '"+ run +"')");
 
             }
@@ -223,6 +225,8 @@ public class MainActivity extends AppCompatActivity {
                             labelDetection.setType("LABEL_DETECTION");
                             labelDetection.setMaxResults(10);
                             add(labelDetection);
+                           
+
 
                             Feature textDetection = new Feature();
                             textDetection.setType("TEXT_DETECTION");
