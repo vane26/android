@@ -2,6 +2,7 @@ package com.google.sample.cloudvision.BD;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -9,14 +10,12 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Created by Vane on 30/08/2016.
  */
 public class personaDbHelper extends SQLiteOpenHelper {
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "persona.bd";
-    String sqlUpdate = "ALTER TABLE personaContract.personaEntry ADD COLUMN run TEXT";
+     String sqlUpdate = "ALTER TABLE personaContract.personaEntry ADD COLUMN run TEXT";
 
 
 
-    public personaDbHelper(Context context){
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    public personaDbHelper(Context context, String nombre, Cursor factory, int version){
+        super(context, nombre, factory, version);
     }
 
 

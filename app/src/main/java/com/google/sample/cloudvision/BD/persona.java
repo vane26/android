@@ -45,5 +45,4 @@ public class persona {
         this.apellidos = apellidos;
     }
 
-
 }

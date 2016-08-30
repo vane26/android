@@ -7,6 +7,7 @@ package com.google.sample.cloudvision;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -36,6 +37,7 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
+import com.google.sample.cloudvision.BD.personaDbHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -46,8 +48,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private static final String CLOUD_VISION_API_KEY = "AIzaSyDGM5VaQzXGLlGqtVejBuqoJ0DFnq20E8g";
     public static final String FILE_NAME = "Browser key 1";
-    boolean almacenar = false;
-
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int GALLERY_IMAGE_REQUEST = 1;
     public static final int CAMERA_PERMISSIONS_REQUEST = 2;
@@ -89,6 +89,28 @@ public class MainActivity extends AppCompatActivity {
         mImageDetails = (TextView) findViewById(R.id.image_details);
         mMainImage = (ImageView) findViewById(R.id.main_image);
 
+
+        //abrimos la base de datos
+        personaDbHelper persona = new personaDbHelper(this, "db_persona", null, 1);
+        SQLiteDatabase sqLiteDatabase= persona.getWritableDatabase();
+
+        // si hemos abierto la base de datos de forma correcta
+
+        if(sqLiteDatabase != null){
+            //insertar 100 usuarios de prototipo
+            for(int i=1; i<=100; i++){
+                //generar codigo
+                int codigo = i;
+                String run = "Persona"+i;
+
+                //isertando los datos a la tabla persona
+                sqLiteDatabase.execSQL("INSERT INTO persona (codigo, run) "+
+                                    "VALUES ("+ codigo + ", '"+ run +"')");
+
+            }
+            //cerrar base de datos
+            sqLiteDatabase.close();
+        }
 
     }
 
