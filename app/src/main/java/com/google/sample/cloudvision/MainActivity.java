@@ -46,6 +46,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private static final String CLOUD_VISION_API_KEY = "AIzaSyDGM5VaQzXGLlGqtVejBuqoJ0DFnq20E8g";
     public static final String FILE_NAME = "Browser key 1";
+    boolean almacenar = false;
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int GALLERY_IMAGE_REQUEST = 1;
@@ -87,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
 
         mImageDetails = (TextView) findViewById(R.id.image_details);
         mMainImage = (ImageView) findViewById(R.id.main_image);
+
+
     }
 
     public void startGalleryChooser() {
