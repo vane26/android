@@ -37,7 +37,6 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
-import com.google.sample.cloudvision.BD.persona;
 import com.google.sample.cloudvision.BD.personaDbHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -106,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 String run = "Persona"+i;
 
                 //isertando los datos a la tabla persona
-                sqLiteDatabase.execSQL("agregar INTO persona (codigo, run) "+
+                sqLiteDatabase.execSQL("AGREGAR INTO persona (codigo, run) "+
                                     "VALUES ("+ codigo + ", '"+ run +"')");
 
             }
@@ -225,8 +224,6 @@ public class MainActivity extends AppCompatActivity {
                             labelDetection.setType("LABEL_DETECTION");
                             labelDetection.setMaxResults(10);
                             add(labelDetection);
-                           
-
 
                             Feature textDetection = new Feature();
                             textDetection.setType("TEXT_DETECTION");
@@ -297,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
             for (EntityAnnotation label : labels) {
                 message += String.format("%.3f: %s", label.getScore(), label.getDescription());
                 message += "\n";
-            }
+                }
         } else {
             message += "nothing";
         }
@@ -308,6 +305,7 @@ public class MainActivity extends AppCompatActivity {
             for (EntityAnnotation text : texts) {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
+
             }
         } else {
             message += "nothing";
