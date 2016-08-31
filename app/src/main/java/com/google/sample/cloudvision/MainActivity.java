@@ -37,7 +37,7 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
-import com.google.sample.cloudvision.BD.personaDbHelper;
+import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //abrimos la base de datos
-        personaDbHelper persona = new personaDbHelper(getBaseContext());
+        registroDbHelper persona = new registroDbHelper(getBaseContext());
         SQLiteDatabase sqLiteDatabase= persona.getWritableDatabase();
         Toast.makeText(getBaseContext(), "Base de datos preparada", Toast.LENGTH_LONG).show();
 
@@ -101,12 +101,9 @@ public class MainActivity extends AppCompatActivity {
             //insertar 100 usuarios de prototipo
             for(int i=1; i<=100; i++){
                 //generar codigo
-                int codigo = i;
-                String run = "Persona"+i;
-
-                //isertando los datos a la tabla persona
-                sqLiteDatabase.execSQL("AGREGAR INTO persona (codigo, run) "+
-                                    "VALUES ("+ codigo + ", '"+ run +"')");
+                 //isertando los datos a la tabla persona
+                sqLiteDatabase.execSQL("INSERT INTO registro (registro registro) " +
+                                     "VALUES (" + i + ", 'INDICE " + i + "', 'TEXTO " + i + " 'CALIDAD" + i + "')");
 
             }
             //cerrar base de datos
@@ -119,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select a photo"),
+        startActivityForResult(Intent.createChooser(intent, "Selecciona una foto"),
                 GALLERY_IMAGE_REQUEST);
     }
 
