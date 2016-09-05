@@ -40,13 +40,8 @@ import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -317,35 +312,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public static void BD_backup() throws IOException {
-        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
-
-        final String inFileName = "/data/data/com.google.sample.cloudvision/databases/" + "registro_db";
-        File dbFile = new File(inFileName);
-        FileInputStream fis = null;
-
-        fis = new FileInputStream(dbFile);
-
-        String directorio = obtenerDirectorioCopias();
-        File d = new File(directorio);
-        if (!d.exists()) {
-            d.mkdir();
-        }
-        String outFileName = directorio + "/" + "registro_db" + "_" + timeStamp;
-
-        OutputStream output = new FileOutputStream(outFileName);
-
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = fis.read(buffer)) > 0) {
-            output.write(buffer, 0, length);
-        }
-
-        output.flush();
-        output.close();
-
-
-    }
 }
 
 
