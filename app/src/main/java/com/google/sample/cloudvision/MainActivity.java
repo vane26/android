@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        registroDbHelper bd= new registroDbHelper(this);
+        registroDbHelper dbHelper= new registroDbHelper(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -269,11 +269,14 @@ public class MainActivity extends AppCompatActivity {
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
         String message = "I found these things:\n\n";
 
+
         List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
         if (labels != null) {
             for (EntityAnnotation label : labels) {
                 message += String.format("%.3f: %s", label.getScore(), label.getDescription());
                 message += "\n";
+
+
                                 }
         } else {
             message += "nothing";
@@ -285,6 +288,8 @@ public class MainActivity extends AppCompatActivity {
             for (EntityAnnotation text : texts) {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
+                registroDbHelper dbHelper= new registroDbHelper(this);
+                dbHelper.agregar(message);
 
             }
         } else {
@@ -303,6 +308,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return message;
+
+
 
     }
 

@@ -12,7 +12,7 @@ import android.util.Log;
 public class registroDbHelper extends SQLiteOpenHelper {
     private static int VERSION = 1;
     private static String DATA_BASE = "registro_db";
-    private SQLiteDatabase db;
+    private SQLiteDatabase sqLiteDatabase;
     private static SQLiteDatabase.CursorFactory factory = null;
     String sqlUpdate = "ALTER TABLE personaContract.personaEntry ADD COLUMN run TEXT";
 
@@ -58,6 +58,21 @@ public class registroDbHelper extends SQLiteOpenHelper {
         return id;
 
     }
+
+    public int agregar(String texto) {
+        int id = 0;
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        if (sqLiteDatabase != null) {
+            ContentValues values = new ContentValues();
+            registro registro = new registro(texto);
+            values.put("TEXTO", registro.getTexto());
+            id = (int) sqLiteDatabase.insert(registroContract.registroEntry.TABLE_NAME, null, values);
+        }
+        sqLiteDatabase.close();
+        return id;
+
+    }
+
 
 
     public int update(registro registro) {

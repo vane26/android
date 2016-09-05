@@ -13,7 +13,14 @@ public registro(String indice, String texto, String calidad){
     this.texto = texto;
     this.calidad = calidad;
 
+
 }
+
+
+public  registro(String texto){
+    this.texto = texto;
+}
+
     public String getIndice(){
         return indice;
     }
