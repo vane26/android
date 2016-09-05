@@ -8,32 +8,32 @@ public class registro {
     private String texto;
     private String calidad;
 
-public registro(String indice, String texto, String calidad){
-    this.indice = indice;
-    this.texto = texto;
-    this.calidad = calidad;
+    public registro(String indice, String texto, String calidad) {
+        this.indice = indice;
+        this.texto = texto;
+        this.calidad = calidad;
 
 
-}
+    }
 
-public registro(){
+    public registro() {
 
-}
+    }
 
 
-public  registro(String texto){
-    this.texto = texto;
-}
+    public registro(String texto) {
+        this.texto = texto;
+    }
 
-    public String getIndice(){
+    public String getIndice() {
         return indice;
     }
 
-    public String getTexto(){
+    public String getTexto() {
         return texto;
     }
 
-    public String getCalidad(){
+    public String getCalidad() {
         return calidad;
     }
 

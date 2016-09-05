@@ -36,6 +36,7 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
+import com.google.sample.cloudvision.BD.registro;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -55,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mImageDetails;
     private ImageView mMainImage;
-
+    private registroDbHelper db;
+    ArrayList<registro> lista = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +66,9 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        registroDbHelper dbHelper = new registroDbHelper(this);
+        db = new registroDbHelper(this);
+        //hay q abrirlo con  un open()
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -290,7 +294,8 @@ public class MainActivity extends AppCompatActivity {
                 message += "\n";
                 registroDbHelper dbHelper = new registroDbHelper(this);
                 dbHelper.agregar(message);
-
+                lista = dbHelper.ListadoGeneral();
+                
             }
         } else {
             message += "nothing";
@@ -310,7 +315,13 @@ public class MainActivity extends AppCompatActivity {
         return message;
 
 
+
+
+
     }
+
+
+
 
 }
 
