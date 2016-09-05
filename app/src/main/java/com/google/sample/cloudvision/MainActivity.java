@@ -40,8 +40,13 @@ import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -64,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        registroDbHelper dbHelper= new registroDbHelper(this);
+        registroDbHelper dbHelper = new registroDbHelper(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -168,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
     private void callCloudVision(final Bitmap bitmap) throws IOException {
         // Switch text to loading
         mImageDetails.setText(R.string.loading_message);
-         // Do the real work in an async task, because we need to use the network anyway
+        // Do the real work in an async task, because we need to use the network anyway
         new AsyncTask<Object, Void, String>() {
             @Override
             protected String doInBackground(Object... params) {
@@ -277,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
                 message += "\n";
 
 
-                                }
+            }
         } else {
             message += "nothing";
         }
@@ -288,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
             for (EntityAnnotation text : texts) {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
-                registroDbHelper dbHelper= new registroDbHelper(this);
+                registroDbHelper dbHelper = new registroDbHelper(this);
                 dbHelper.agregar(message);
 
             }
@@ -310,10 +315,37 @@ public class MainActivity extends AppCompatActivity {
         return message;
 
 
-
     }
 
+    public static void BD_backup() throws IOException {
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
 
+        final String inFileName = "/data/data/com.google.sample.cloudvision/databases/" + "registro_db";
+        File dbFile = new File(inFileName);
+        FileInputStream fis = null;
+
+        fis = new FileInputStream(dbFile);
+
+        String directorio = obtenerDirectorioCopias();
+        File d = new File(directorio);
+        if (!d.exists()) {
+            d.mkdir();
+        }
+        String outFileName = directorio + "/" + "registro_db" + "_" + timeStamp;
+
+        OutputStream output = new FileOutputStream(outFileName);
+
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = fis.read(buffer)) > 0) {
+            output.write(buffer, 0, length);
+        }
+
+        output.flush();
+        output.close();
+
+
+    }
 }
 
 
