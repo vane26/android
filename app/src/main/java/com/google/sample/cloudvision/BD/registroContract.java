@@ -6,7 +6,7 @@ import android.provider.BaseColumns;
  * Created by Vane on 31/08/2016.
  */
 public class registroContract {
-    public static abstract class personaEntry implements BaseColumns {
+     public static abstract class registroEntry implements BaseColumns {
         public static final String TABLE_NAME = "registro";
 
         public static final String INDICE = "indice";

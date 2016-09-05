@@ -33,12 +33,12 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("CREATE TABLE " + registroContract.personaEntry.TABLE_NAME + " ("
-                + registroContract.personaEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + registroContract.personaEntry.INDICE + " TEXT,"
-                + registroContract.personaEntry.TEXTO + " TEXT,"
-                + registroContract.personaEntry.CALIDAD + " TEXT,"
-                + "UNIQUE (" + registroContract.personaEntry.INDICE + "))");
+        sqLiteDatabase.execSQL("CREATE TABLE " + registroContract.registroEntry.TABLE_NAME + " ("
+                + registroContract.registroEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + registroContract.registroEntry.INDICE + " TEXT,"
+                + registroContract.registroEntry.TEXTO + " TEXT,"
+                + registroContract.registroEntry.CALIDAD + " TEXT,"
+                + "UNIQUE (" + registroContract.registroEntry.INDICE + "))");
         Log.i(this.getClass().toString(), "Tabla persona creada");
 
     }
@@ -52,7 +52,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
             values.put("INDICE", registro.getIndice());
             values.put("TEXTO", registro.getTexto());
             values.put("CALIDAD DE IMAGEN", registro.getCalidad());
-            id = (int) sqLiteDatabase.insert(registroContract.personaEntry.TABLE_NAME, null, values);
+            id = (int) sqLiteDatabase.insert(registroContract.registroEntry.TABLE_NAME, null, values);
         }
         sqLiteDatabase.close();
         return id;
@@ -68,7 +68,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
             values.put("INDICE", registro.getIndice());
             values.put("TEXTO", registro.getTexto());
             values.put("CALIDAD DE IMAGEN", registro.getCalidad());
-            filasAfectadas = (int) sqLiteDatabase.update(registroContract.personaEntry.TABLE_NAME, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getIndice())});
+            filasAfectadas = (int) sqLiteDatabase.update(registroContract.registroEntry.TABLE_NAME, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getIndice())});
         }
         sqLiteDatabase.close();
         return filasAfectadas;
@@ -77,8 +77,8 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     public int delete(String registroindice) {
         return getWritableDatabase().delete(
-                registroContract.personaEntry.TABLE_NAME,
-                registroContract.personaEntry.INDICE + " LIKE ?",
+                registroContract.registroEntry.TABLE_NAME,
+                registroContract.registroEntry.INDICE + " LIKE ?",
                 new String[]{registroindice});
     }
 

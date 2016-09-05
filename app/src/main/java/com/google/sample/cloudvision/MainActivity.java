@@ -7,7 +7,6 @@ package com.google.sample.cloudvision;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -53,8 +52,10 @@ public class MainActivity extends AppCompatActivity {
     public static final int CAMERA_PERMISSIONS_REQUEST = 2;
     public static final int CAMERA_IMAGE_REQUEST = 3;
 
+
     private TextView mImageDetails;
     private ImageView mMainImage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        registroDbHelper bd= new registroDbHelper(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -89,26 +92,6 @@ public class MainActivity extends AppCompatActivity {
         mImageDetails = (TextView) findViewById(R.id.image_details);
         mMainImage = (ImageView) findViewById(R.id.main_image);
 
-
-        //abrimos la base de datos
-        registroDbHelper persona = new registroDbHelper(getBaseContext());
-        SQLiteDatabase sqLiteDatabase= persona.getWritableDatabase();
-        Toast.makeText(getBaseContext(), "Base de datos preparada", Toast.LENGTH_LONG).show();
-
-        // si hemos abierto la base de datos de forma correcta
-
-        if(sqLiteDatabase != null){
-            //insertar 100 usuarios de prototipo
-            for(int i=1; i<=100; i++){
-                //generar codigo
-                 //isertando los datos a la tabla persona
-                sqLiteDatabase.execSQL("INSERT INTO registro (registro registro) " +
-                                     "VALUES (" + i + ", 'INDICE " + i + "', 'TEXTO " + i + " 'CALIDAD" + i + "')");
-
-            }
-            //cerrar base de datos
-            sqLiteDatabase.close();
-        }
 
     }
 
@@ -291,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
             for (EntityAnnotation label : labels) {
                 message += String.format("%.3f: %s", label.getScore(), label.getDescription());
                 message += "\n";
-                }
+                                }
         } else {
             message += "nothing";
         }
@@ -322,4 +305,9 @@ public class MainActivity extends AppCompatActivity {
         return message;
 
     }
+
+
 }
+
+
+
