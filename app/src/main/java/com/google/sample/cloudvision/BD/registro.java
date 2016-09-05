@@ -16,6 +16,10 @@ public registro(String indice, String texto, String calidad){
 
 }
 
+public registro(){
+
+}
+
 
 public  registro(String texto){
     this.texto = texto;

@@ -2,9 +2,12 @@ package com.google.sample.cloudvision.BD;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import java.util.ArrayList;
 
 /**
  * Created by Vane on 31/08/2016.
@@ -20,6 +23,8 @@ public class registroDbHelper extends SQLiteOpenHelper {
     public registroDbHelper(Context context) {
         super(context, DATA_BASE, factory, VERSION);
     }
+
+
 
 
     @Override
@@ -74,7 +79,6 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
-
     public int update(registro registro) {
         int filasAfectadas = 0;
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
@@ -96,5 +100,30 @@ public class registroDbHelper extends SQLiteOpenHelper {
                 registroContract.registroEntry.INDICE + " LIKE ?",
                 new String[]{registroindice});
     }
+
+
+    public ArrayList<registro> ListadoGeneral() {
+        Cursor c;
+        ArrayList<registro> listado = new ArrayList<>();
+        c = sqLiteDatabase.rawQuery("SELECT * FROM registro ",null);
+        while (c.moveToNext()){
+           registro registro = new registro();
+                    registro.setIndice(c.getString(0));
+                    registro.setTexto(c.getString(1));
+                    registro.setCalidad(c.getString(2));
+            listado.add(registro);
+                }
+        c.close();
+        return listado;
+
+}
+
+
+
+
+
+
+
+
 
 }
