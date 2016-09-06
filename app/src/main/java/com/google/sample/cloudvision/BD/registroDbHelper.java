@@ -13,6 +13,7 @@ import java.util.List;
 /**
  * Created by Vane on 31/08/2016.
  */
+
 public class registroDbHelper extends SQLiteOpenHelper {
     private static int VERSION = 1;
     private static String DATA_BASE = "registro_db";
@@ -49,7 +50,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
 //conexiones
     public void abrir(){
         Log.i("SQLite", "Se cierra conexion a la base de datos " + registroDbHelper.getDatabaseName());
-        db = registroDbHelper.getWritableDatabase();
+        registroDbHelper.close();
     }
 
 
@@ -134,6 +135,24 @@ public class registroDbHelper extends SQLiteOpenHelper {
         return listado;
     }
 
+
+    public List<registro> ListadoGeneraluno() {
+        List<registro> listado = new ArrayList<>();
+        String selectQuery = "SELECT * FROM" + registroContract.registroEntry.TABLE_NAME;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                registro registro = new registro();
+                registro.setTexto(cursor.getString(0));
+                listado.add(registro);
+
+            } while (cursor.moveToNext());
+        }
+        return listado;
+    }
 
 
 }
