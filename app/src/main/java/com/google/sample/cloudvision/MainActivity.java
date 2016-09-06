@@ -51,10 +51,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int CAMERA_PERMISSIONS_REQUEST = 2;
     public static final int CAMERA_IMAGE_REQUEST = 3;
 
-<<<<<<< HEAD
-    //registroDbHelper db;
-=======
->>>>>>> origin/master
+
     private TextView mImageDetails;
     private ImageView mMainImage;
 
@@ -305,19 +302,7 @@ public class MainActivity extends AppCompatActivity {
                // db.agregar(message);
 
 
-<<<<<<< HEAD
-=======
-                Log.d("agregar", "agregando..");
-                db.agregar(message);
-                Log.d("leer", "leyendo todos los registros");
-                List<registro> registro = db.ListadoGeneral();
 
-                for (registro reg : registro){
-                    String log = "Indice: "+reg.getIndice() + ",Texto: "+reg.getTexto() + ",Calidad:" +reg.getCalidad();
-                    Log.d("Texto: ", log);
-                }
-
->>>>>>> origin/master
             }
         } else {
             message += "nothing";
@@ -337,25 +322,15 @@ public class MainActivity extends AppCompatActivity {
 
         return message;
 
-
-<<<<<<< HEAD
-
-
-
-
+        
 
     }
 
 
 
 
-
-
-=======
     }
 
->>>>>>> origin/master
-}
 
 
 
