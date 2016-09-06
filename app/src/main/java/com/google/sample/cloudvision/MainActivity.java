@@ -53,10 +53,20 @@ public class MainActivity extends AppCompatActivity {
     public static final int CAMERA_PERMISSIONS_REQUEST = 2;
     public static final int CAMERA_IMAGE_REQUEST = 3;
 
-
     private TextView mImageDetails;
     private ImageView mMainImage;
 
+
+
+    public void tiempoTotal(String args[]) {
+        long totalTiempo;
+        long tiempoInicio;
+
+        tiempoInicio = System.currentTimeMillis();
+        totalTiempo = System.currentTimeMillis() - tiempoInicio;
+
+        String message ="Tiempo ejecucion"+totalTiempo;
+    }
 
 
     @Override
@@ -303,8 +313,7 @@ public class MainActivity extends AppCompatActivity {
                     String log = "Indice: "+reg.getIndice() + ",Texto: "+reg.getTexto() + ",Calidad:" +reg.getCalidad();
                     Log.d("Texto: ", log);
                 }
-                db.close();
-                
+
             }
         } else {
             message += "nothing";
@@ -325,13 +334,7 @@ public class MainActivity extends AppCompatActivity {
         return message;
 
 
-
-
-
     }
-
-
-
 
 }
 
