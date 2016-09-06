@@ -2,12 +2,9 @@ package com.google.sample.cloudvision.BD;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-
-import java.util.ArrayList;
 
 /**
  * Created by Vane on 31/08/2016.
@@ -15,9 +12,10 @@ import java.util.ArrayList;
 public class registroDbHelper extends SQLiteOpenHelper {
     private static int VERSION = 1;
     private static String DATA_BASE = "registro_db";
-    private SQLiteDatabase sqLiteDatabase;
+    SQLiteDatabase db;
+    registroDbHelper registroDbHelper;
     private static SQLiteDatabase.CursorFactory factory = null;
-    String sqlUpdate = "ALTER TABLE personaContract.personaEntry ADD COLUMN run TEXT";
+
 
 
     public registroDbHelper(Context context) {
@@ -25,20 +23,9 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
-
-
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (newVersion > oldVersion) {
-            db.execSQL(sqlUpdate);
-
-        } else
-            onCreate(db);
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("CREATE TABLE " + registroContract.registroEntry.TABLE_NAME + " ("
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + registroContract.registroEntry.TABLE_NAME + " ("
                 + registroContract.registroEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + registroContract.registroEntry.INDICE + " TEXT,"
                 + registroContract.registroEntry.TEXTO + " TEXT,"
@@ -49,31 +36,50 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS" + DATA_BASE);
+        onCreate(db);
+    }
+
+
+    public void abrir(){
+        Log.i("SQLite", "Se cierra conexion a la base de datos " + registroDbHelper.getDatabaseName());
+        db = registroDbHelper.getWritableDatabase();
+    }
+
+
+    public void cerrar(){
+        Log.i("SQLite", "Se cierra conexion a la base de datos " + registroDbHelper.getDatabaseName());
+        registroDbHelper.close();
+    }
+
+
     public int insert(registro registro) {
         int id = 0;
-        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
-        if (sqLiteDatabase != null) {
+        SQLiteDatabase db = getWritableDatabase();
+        if (db != null) {
             ContentValues values = new ContentValues();
             values.put("INDICE", registro.getIndice());
             values.put("TEXTO", registro.getTexto());
             values.put("CALIDAD DE IMAGEN", registro.getCalidad());
-            id = (int) sqLiteDatabase.insert(registroContract.registroEntry.TABLE_NAME, null, values);
+            id = (int) db.insert(registroContract.registroEntry.TABLE_NAME, null, values);
         }
-        sqLiteDatabase.close();
+        db.close();
         return id;
 
     }
 
     public int agregar(String texto) {
         int id = 0;
-        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
-        if (sqLiteDatabase != null) {
+        SQLiteDatabase db = getWritableDatabase();
+        if (db != null) {
             ContentValues values = new ContentValues();
             registro registro = new registro(texto);
             values.put("TEXTO", registro.getTexto());
-            id = (int) sqLiteDatabase.insert(registroContract.registroEntry.TABLE_NAME, null, values);
+            id = (int) db.insert(registroContract.registroEntry.TABLE_NAME, null, values);
         }
-        sqLiteDatabase.close();
+        db.close();
         return id;
 
     }
@@ -81,15 +87,15 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     public int update(registro registro) {
         int filasAfectadas = 0;
-        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
-        if (sqLiteDatabase != null) {
+        SQLiteDatabase db = getWritableDatabase();
+        if (db != null) {
             ContentValues values = new ContentValues();
             values.put("INDICE", registro.getIndice());
             values.put("TEXTO", registro.getTexto());
             values.put("CALIDAD DE IMAGEN", registro.getCalidad());
-            filasAfectadas = (int) sqLiteDatabase.update(registroContract.registroEntry.TABLE_NAME, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getIndice())});
+            filasAfectadas = (int) db.update(registroContract.registroEntry.TABLE_NAME, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getIndice())});
         }
-        sqLiteDatabase.close();
+        db.close();
         return filasAfectadas;
     }
 
@@ -100,25 +106,6 @@ public class registroDbHelper extends SQLiteOpenHelper {
                 registroContract.registroEntry.INDICE + " LIKE ?",
                 new String[]{registroindice});
     }
-
-
-    public ArrayList<registro> ListadoGeneral() {
-        Cursor c;
-        ArrayList<registro> listado = new ArrayList<>();
-        c = sqLiteDatabase.rawQuery("SELECT * FROM registro ",null);
-        while (c.moveToNext()){
-           registro registro = new registro();
-                    registro.setIndice(c.getString(0));
-                    registro.setTexto(c.getString(1));
-                    registro.setCalidad(c.getString(2));
-            listado.add(registro);
-                }
-        c.close();
-        return listado;
-
-}
-
-
 
 
 
