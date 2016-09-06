@@ -2,9 +2,13 @@ package com.google.sample.cloudvision.BD;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Vane on 31/08/2016.
@@ -42,7 +46,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-
+//conexiones
     public void abrir(){
         Log.i("SQLite", "Se cierra conexion a la base de datos " + registroDbHelper.getDatabaseName());
         db = registroDbHelper.getWritableDatabase();
@@ -55,6 +59,8 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
+
+    //metodos
     public int insert(registro registro) {
         int id = 0;
         SQLiteDatabase db = getWritableDatabase();
@@ -108,8 +114,25 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
+    public List<registro> ListadoGeneral() {
+        List<registro> listado = new ArrayList<>();
+        String selectQuery = "SELECT * FROM" + registroContract.registroEntry.TABLE_NAME;
 
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
 
+        if (cursor.moveToFirst()) {
+            do {
+                registro registro = new registro();
+                registro.setIndice(cursor.getString(0));
+                registro.setTexto(cursor.getString(1));
+                registro.setCalidad(cursor.getString(2));
+                listado.add(registro);
+
+            } while (cursor.moveToNext());
+        }
+        return listado;
+    }
 
 
 

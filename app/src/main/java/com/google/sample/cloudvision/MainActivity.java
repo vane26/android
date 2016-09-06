@@ -36,6 +36,7 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
+import com.google.sample.cloudvision.BD.registro;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -65,9 +66,6 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        registroDbHelper db = new registroDbHelper(this);
-        db.abrir(); // base de datos abierta
-        
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -291,13 +289,26 @@ public class MainActivity extends AppCompatActivity {
             for (EntityAnnotation text : texts) {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
-                registroDbHelper dbHelper = new registroDbHelper(this);
-                dbHelper.agregar(message);
 
+                registroDbHelper db = new registroDbHelper(this);
+                db.abrir();
+                // base de datos abierta
+
+                Log.d("agregar", "agregando..");
+                db.agregar(message);
+                Log.d("leer", "leyendo todos los registros");
+                List<registro> registro = db.ListadoGeneral();
+
+                for (registro reg : registro){
+                    String log = "Indice: "+reg.getIndice() + ",Texto: "+reg.getTexto() + ",Calidad:" +reg.getCalidad();
+                    Log.d("Texto: ", log);
+                }
+                db.close();
                 
             }
         } else {
             message += "nothing";
+
         }
 
 
