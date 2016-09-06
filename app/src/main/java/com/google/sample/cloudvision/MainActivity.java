@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int GALLERY_IMAGE_REQUEST = 1;
     public static final int CAMERA_PERMISSIONS_REQUEST = 2;
     public static final int CAMERA_IMAGE_REQUEST = 3;
-
+    //registroDbHelper db;
 
     private TextView mImageDetails;
     private ImageView mMainImage;
@@ -64,8 +64,11 @@ public class MainActivity extends AppCompatActivity {
         tiempoInicio = System.currentTimeMillis();
         totalTiempo = System.currentTimeMillis() - tiempoInicio;
 
-        String message ="Tiempo ejecucion"+totalTiempo;
+        String message ="Tiempo ejecucion" + totalTiempo;
+
     }
+
+
 
 
     @Override
@@ -322,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
 
         return message;
 
-        
+
 
     }
 

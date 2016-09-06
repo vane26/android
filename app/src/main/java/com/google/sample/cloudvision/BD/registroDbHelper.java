@@ -117,7 +117,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     public List<registro> ListadoGeneral() {
         List<registro> listado = new ArrayList<>();
-        String selectQuery = "SELECT * FROM" + registroContract.registroEntry.TABLE_NAME;
+        String selectQuery = "SELECT * FROM " + registroContract.registroEntry.TABLE_NAME;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -138,7 +138,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     public List<registro> ListadoGeneraluno() {
         List<registro> listado = new ArrayList<>();
-        String selectQuery = "SELECT * FROM" + registroContract.registroEntry.TABLE_NAME;
+        String selectQuery = "SELECT TEXTO FROM " + registroContract.registroEntry.TABLE_NAME;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
