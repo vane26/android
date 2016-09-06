@@ -15,8 +15,8 @@ import java.util.List;
  */
 
 public class registroDbHelper extends SQLiteOpenHelper {
-    private static int VERSION = 1;
-    private static String DATA_BASE = "registro_db";
+    private static int version = 1;
+    private static String data_base= "registro_db";
     SQLiteDatabase db;
     registroDbHelper registroDbHelper;
     private static SQLiteDatabase.CursorFactory factory = null;
@@ -24,18 +24,18 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
 
     public registroDbHelper(Context context) {
-        super(context, DATA_BASE, factory, VERSION);
+        super(context, data_base, factory, version);
     }
 
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + registroContract.registroEntry.TABLE_NAME + " ("
+        db.execSQL("CREATE TABLE " + registroContract.registroEntry.table_name + " ("
                 + registroContract.registroEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + registroContract.registroEntry.INDICE + " TEXT,"
-                + registroContract.registroEntry.TEXTO + " TEXT,"
-                + registroContract.registroEntry.CALIDAD + " TEXT,"
-                + "UNIQUE (" + registroContract.registroEntry.INDICE + "))");
+                + registroContract.registroEntry.indice + " TEXT,"
+                + registroContract.registroEntry.texto + " TEXT,"
+                + registroContract.registroEntry.calidad + " TEXT,"
+                + "UNIQUE (" + registroContract.registroEntry._ID + "))");
         Log.i(this.getClass().toString(), "Tabla persona creada");
 
     }
@@ -43,7 +43,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS" + DATA_BASE);
+        db.execSQL("DROP TABLE IF EXISTS" + data_base);
         onCreate(db);
     }
 
@@ -70,7 +70,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
             values.put("INDICE", registro.getIndice());
             values.put("TEXTO", registro.getTexto());
             values.put("CALIDAD DE IMAGEN", registro.getCalidad());
-            id = (int) db.insert(registroContract.registroEntry.TABLE_NAME, null, values);
+            id = (int) db.insert(registroContract.registroEntry.table_name, null, values);
         }
         db.close();
         return id;
@@ -84,7 +84,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             registro registro = new registro(texto);
             values.put("TEXTO", registro.getTexto());
-            id = (int) db.insert(registroContract.registroEntry.TABLE_NAME, null, values);
+            id = (int) db.insert(registroContract.registroEntry.table_name, null, values);
         }
         db.close();
         return id;
@@ -100,7 +100,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
             values.put("INDICE", registro.getIndice());
             values.put("TEXTO", registro.getTexto());
             values.put("CALIDAD DE IMAGEN", registro.getCalidad());
-            filasAfectadas = (int) db.update(registroContract.registroEntry.TABLE_NAME, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getIndice())});
+            filasAfectadas = (int) db.update(registroContract.registroEntry.table_name, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getIndice())});
         }
         db.close();
         return filasAfectadas;
@@ -109,15 +109,15 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     public int delete(String registroindice) {
         return getWritableDatabase().delete(
-                registroContract.registroEntry.TABLE_NAME,
-                registroContract.registroEntry.INDICE + " LIKE ?",
+                registroContract.registroEntry.table_name,
+                registroContract.registroEntry.indice + " LIKE ?",
                 new String[]{registroindice});
     }
 
 
     public List<registro> ListadoGeneral() {
         List<registro> listado = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + registroContract.registroEntry.TABLE_NAME;
+        String selectQuery = "SELECT * FROM " + registroContract.registroEntry.table_name;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -138,7 +138,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     public List<registro> ListadoGeneraluno() {
         List<registro> listado = new ArrayList<>();
-        String selectQuery = "SELECT TEXTO FROM " + registroContract.registroEntry.TABLE_NAME;
+        String selectQuery = "SELECT TEXTO FROM " + registroContract.registroEntry.table_name;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);

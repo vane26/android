@@ -7,11 +7,11 @@ import android.provider.BaseColumns;
  */
 public class registroContract {
      public static abstract class registroEntry implements BaseColumns {
-        public static final String TABLE_NAME = "registro";
+        public static final String table_name = "registro";
 
-        public static final String INDICE = "indice";
-        public static final String TEXTO = "texto";
-        public static final String CALIDAD = "calidad";
+        public static final String indice = "indice";
+        public static final String texto= "texto";
+        public static final String calidad= "calidad";
 
     }
 
