@@ -57,21 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void tiempoTotal(String args[]) {
-        long totalTiempo;
-        long tiempoInicio;
-
-        tiempoInicio = System.currentTimeMillis();
-        totalTiempo = System.currentTimeMillis() - tiempoInicio;
-
-        String message ="Tiempo ejecucion" + totalTiempo;
-
-    }
-
-
-
-
-    @Override
+       @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -302,6 +288,7 @@ public class MainActivity extends AppCompatActivity {
             for (EntityAnnotation text : texts) {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
+
                // db.agregar(message);
 
 
