@@ -15,61 +15,66 @@ import java.util.List;
  */
 
 public class registroDbHelper extends SQLiteOpenHelper {
-    private static int version = 1;
-    private static String data_base= "registro_db";
+    public static int version = 2;
+    public static String db_path = "/data/data/com.google.sample.cloudvision.BD/databases";
+    public static String data_base = "registro_db";
     SQLiteDatabase db;
+    private final  Context myContext;
     registroDbHelper registroDbHelper;
     private static SQLiteDatabase.CursorFactory factory = null;
 
 
+    String sqlCreate = "CREATE TABLE registro (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "indice TEXT, texto TEXT, calidad TEXT)";
+    String sqlUpdate = "ALTER TABLE registro ADD COLUMN indice TEXT";
 
-    public registroDbHelper(Context context) {
-        super(context, data_base, factory, version);
-    }
-
-
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + registroContract.registroEntry.table_name + " ("
-                + registroContract.registroEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + registroContract.registroEntry.indice + " TEXT,"
-                + registroContract.registroEntry.texto + " TEXT,"
-                + registroContract.registroEntry.calidad + " TEXT,"
-                + "UNIQUE (" + registroContract.registroEntry._ID + "))");
-        Log.i(this.getClass().toString(), "Tabla persona creada");
+    public registroDbHelper(Context context, String nombre, SQLiteDatabase.CursorFactory factory, int version) {
+        super(context, nombre, factory, version);
+        this.myContext = context;
 
     }
 
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS" + data_base);
-        onCreate(db);
+    public void onCreate(SQLiteDatabase db) { // codigo para crear base de datos
+      if (db.isReadOnly()){
+          db = getWritableDatabase();
+      }
+      db.execSQL(sqlCreate);
+
+    }
+
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { //codigo en caso de querer crear mas campos en nuestra base de datos
+        if (newVersion > oldVersion){
+            db.execSQL(sqlUpdate);
+        }
     }
 
 //conexiones
     public void abrir(){
-        Log.i("SQLite", "Se cierra conexion a la base de datos " + registroDbHelper.getDatabaseName());
+        Log.i("SQLite ", "Se cierra conexion a la base de datos " + registroDbHelper.getDatabaseName());
         registroDbHelper.close();
     }
 
 
     public void cerrar(){
-        Log.i("SQLite", "Se cierra conexion a la base de datos " + registroDbHelper.getDatabaseName());
+        Log.i("SQLite ", "Se cierra conexion a la base de datos " + registroDbHelper.getDatabaseName());
         registroDbHelper.close();
     }
 
 
 
-    //metodos
+    //metodos insert, update, query
     public int insert(registro registro) {
         int id = 0;
         SQLiteDatabase db = getWritableDatabase();
         if (db != null) {
             ContentValues values = new ContentValues();
-            values.put("INDICE", registro.getIndice());
-            values.put("TEXTO", registro.getTexto());
-            values.put("CALIDAD DE IMAGEN", registro.getCalidad());
+            values.put("INDICE ", registro.getIndice());
+            values.put("TEXTO ", registro.getTexto());
+            values.put("CALIDAD ", registro.getCalidad());
             id = (int) db.insert(registroContract.registroEntry.table_name, null, values);
         }
         db.close();
@@ -83,7 +88,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
         if (db != null) {
             ContentValues values = new ContentValues();
             registro registro = new registro(texto);
-            values.put("TEXTO", registro.getTexto());
+            values.put("TEXTO ", registro.getTexto());
             id = (int) db.insert(registroContract.registroEntry.table_name, null, values);
         }
         db.close();
@@ -97,9 +102,9 @@ public class registroDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         if (db != null) {
             ContentValues values = new ContentValues();
-            values.put("INDICE", registro.getIndice());
-            values.put("TEXTO", registro.getTexto());
-            values.put("CALIDAD DE IMAGEN", registro.getCalidad());
+            values.put("INDICE ", registro.getIndice());
+            values.put("TEXTO ", registro.getTexto());
+            values.put("CALIDAD ", registro.getCalidad());
             filasAfectadas = (int) db.update(registroContract.registroEntry.table_name, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getIndice())});
         }
         db.close();

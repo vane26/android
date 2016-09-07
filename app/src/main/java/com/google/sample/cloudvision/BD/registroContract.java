@@ -10,8 +10,8 @@ public class registroContract {
         public static final String table_name = "registro";
 
         public static final String indice = "indice";
-        public static final String texto= "texto";
-        public static final String calidad= "calidad";
+        public static final String texto = "texto";
+        public static final String calidad = "calidad";
 
     }
 

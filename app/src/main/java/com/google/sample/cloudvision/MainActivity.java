@@ -36,6 +36,7 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
+import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int GALLERY_IMAGE_REQUEST = 1;
     public static final int CAMERA_PERMISSIONS_REQUEST = 2;
     public static final int CAMERA_IMAGE_REQUEST = 3;
-    //registroDbHelper db;
+    registroDbHelper db;
 
     private TextView mImageDetails;
     private ImageView mMainImage;
@@ -64,8 +65,9 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-       // db = new registroDbHelper(this);
-       // db.abrir();
+        db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
+        db.getWritableDatabase(); //accion a realizar, lectura o escritura.
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -288,12 +290,10 @@ public class MainActivity extends AppCompatActivity {
             for (EntityAnnotation text : texts) {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
-
-               // db.agregar(message);
-
-
+                String grabar = "guardo cadena" + db.agregar(message);
 
             }
+
         } else {
             message += "nothing";
 
