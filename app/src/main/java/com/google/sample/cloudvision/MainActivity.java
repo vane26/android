@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-       @Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -290,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
             for (EntityAnnotation text : texts) {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
-                String grabar = "guardo cadena" + db.agregar(message);
+                //db.agregar(message);
 
             }
 
@@ -319,8 +319,4 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    }
-
-
-
-
+}
