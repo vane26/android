@@ -173,7 +173,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
         File dbFile = new File(inFileName);
         FileInputStream fis = new FileInputStream(dbFile);
 
-        String outFileName = Environment.getExternalStorageDirectory()+"/registro_db";
+        String outFileName = Environment.getExternalStorageDirectory()+"/registro.txt";
         //Open the empty db as the output stream
         OutputStream output = new FileOutputStream(outFileName);
         //transfer bytes from the inputfile to the outputfile
