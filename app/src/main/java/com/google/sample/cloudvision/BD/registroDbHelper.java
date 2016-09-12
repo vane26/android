@@ -5,8 +5,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +24,9 @@ public class registroDbHelper extends SQLiteOpenHelper {
     public static int version = 2;
     public static String db_path = "/data/data/com.google.sample.cloudvision.BD/databases/";
     public static String data_base = "registro_db";
-    SQLiteDatabase db;
+   // SQLiteDatabase db;
+    registroDbHelper db;
     private final Context myContext;
-    registroDbHelper registroDbHelper;
     private static SQLiteDatabase.CursorFactory factory = null;
 
 
@@ -33,6 +39,9 @@ public class registroDbHelper extends SQLiteOpenHelper {
         this.myContext = context;
 
     }
+
+
+
 
 
     @Override
@@ -54,14 +63,14 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     //conexiones
     public void abrir() {
-        Log.i("SQLite ", "Se cierra conexion a la base de datos " + registroDbHelper.getDatabaseName());
-        registroDbHelper.close();
+        Log.i("SQLite ", "Se abre conexion a la base de datos " + db.getWritableDatabase());
+        db.close();
     }
 
 
     public void cerrar() {
-        Log.i("SQLite ", "Se cierra conexion a la base de datos " + registroDbHelper.getDatabaseName());
-        registroDbHelper.close();
+        Log.i("SQLite ", "Se cierra conexion a la base de datos " + db.getDatabaseName());
+        db.close();
     }
 
 
@@ -156,6 +165,27 @@ public class registroDbHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         return listado;
+    }
+
+    public static void backupDatabase() throws IOException {
+        //Open your local db as the input stream
+        String inFileName = "/data/data/com.google.sample.cloudvision.BD/databases/registro_db";
+        File dbFile = new File(inFileName);
+        FileInputStream fis = new FileInputStream(dbFile);
+
+        String outFileName = Environment.getExternalStorageDirectory()+"/registro_db";
+        //Open the empty db as the output stream
+        OutputStream output = new FileOutputStream(outFileName);
+        //transfer bytes from the inputfile to the outputfile
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = fis.read(buffer))>0){
+            output.write(buffer, 0, length);
+        }
+        //Close the streams
+        output.flush();
+        output.close();
+        fis.close();
     }
 
 
