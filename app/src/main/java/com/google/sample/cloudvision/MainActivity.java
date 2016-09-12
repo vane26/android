@@ -7,6 +7,8 @@ package com.google.sample.cloudvision;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -41,6 +43,7 @@ import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,14 +69,49 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        File dbFile = getDatabasePath("registro_db");
         db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
         db.getWritableDatabase(); //accion a realizar, lectura o escritura.
 
+        File exportDir = new File(Environment.getExternalStorageDirectory()
+                .getPath(), "");
+
+        if (!exportDir.exists())
+
+        {
+
+            exportDir.mkdirs();
+
+        }
+
+        File file = new File(exportDir, "Filename.csv");
+
+        try
+
+        {
+
+            file.createNewFile();
+
+            FileWriter nuevo = new FileWriter(file);
+            CsvWriter csvWrite = new CsvWriter("nuevo" + nuevo);
+
+            SQLiteDatabase dbase = db.getReadableDatabase();
+
+            db.ListadoGeneraluno();
+        }catch (SQLException sqlEx)   {
+            Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
+        }
+        catch (IOException e) {
+            Log.e("MainActivity", e.getMessage(), e);
+        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
+
+
             @Override
             public void onClick(View view) {
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder
                         .setMessage(R.string.dialog_select_prompt)
@@ -91,6 +129,9 @@ public class MainActivity extends AppCompatActivity {
                         });
                 builder.create().show();
             }
+
+
+
         });
 
         mImageDetails = (TextView) findViewById(R.id.image_details);

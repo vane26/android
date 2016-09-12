@@ -16,10 +16,10 @@ import java.util.List;
 
 public class registroDbHelper extends SQLiteOpenHelper {
     public static int version = 2;
-    public static String db_path = "/data/data/com.google.sample.cloudvision.BD/databases";
+    public static String db_path = "/data/data/com.google.sample.cloudvision.BD/databases/";
     public static String data_base = "registro_db";
     SQLiteDatabase db;
-    private final  Context myContext;
+    private final Context myContext;
     registroDbHelper registroDbHelper;
     private static SQLiteDatabase.CursorFactory factory = null;
 
@@ -37,33 +37,32 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) { // codigo para crear base de datos
-      if (db.isReadOnly()){
-          db = getWritableDatabase();
-      }
-      db.execSQL(sqlCreate);
+        if (db.isReadOnly()) {
+            db = getWritableDatabase();
+        }
+        db.execSQL(sqlCreate);
 
     }
 
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { //codigo en caso de querer crear mas campos en nuestra base de datos
-        if (newVersion > oldVersion){
+        if (newVersion > oldVersion) {
             db.execSQL(sqlUpdate);
         }
     }
 
-//conexiones
-    public void abrir(){
+    //conexiones
+    public void abrir() {
         Log.i("SQLite ", "Se cierra conexion a la base de datos " + registroDbHelper.getDatabaseName());
         registroDbHelper.close();
     }
 
 
-    public void cerrar(){
+    public void cerrar() {
         Log.i("SQLite ", "Se cierra conexion a la base de datos " + registroDbHelper.getDatabaseName());
         registroDbHelper.close();
     }
-
 
 
     //metodos insert, update, query
