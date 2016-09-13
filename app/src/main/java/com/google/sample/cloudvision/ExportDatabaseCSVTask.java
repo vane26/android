@@ -20,7 +20,7 @@ public class ExportDatabaseCSVTask extends AsyncTask<String, Void, Boolean> {
 
     protected Boolean doInBackground(final String... args) {
         String currentDBPath = "/data/data/com.google.sample.cloudvision.BD/databases/registro_db";
-        File dbFile = getDatabasePath(""+currentDBPath);
+        File dbFile = getDatabasePath("" + currentDBPath);
         System.out.println(dbFile);  // displays the data base path in your logcat
         File exportDir = new File(Environment.getExternalStorageDirectory(), "/sdcard/registro_db");
 

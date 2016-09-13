@@ -5,11 +5,7 @@ package com.google.sample.cloudvision;
  */
 
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -80,419 +76,98 @@ public class CsvWriter {
 
 
 
-    public CsvWriter(String fileName, char delimiter, Charset charset) {
-        if (fileName == null) {
-            throw new IllegalArgumentException("Parameter fileName can not be null.");
-        }
-
-        if (charset == null) {
-            throw new IllegalArgumentException("Parameter charset can not be null.");
-        }
-
-        this.fileName = fileName;
-        userSettings.Delimiter = delimiter;
-        this.charset = charset;
-    }
     public CsvWriter(Writer writer) {
-        this(writer, DEFAULT_SEPARATOR, DEFAULT_QUOTE_CHARACTER, DEFAULT_ESCAPE_CHARACTER, DEFAULT_LINE_END);
-    }
-
-
-    public CsvWriter(Writer writer, char defaultSeparator, char defaultQuoteCharacter, char defaultEscapeCharacter, String fileName) {
-        this(fileName, Letters.COMMA, Charset.forName("ISO-8859-1"));
-    }
-
-    public CsvWriter(Writer outputStream, char delimiter) {
-        if (outputStream == null) {
-            throw new IllegalArgumentException("Parameter outputStream can not be null.");
-        }
-
-        this.outputStream = outputStream;
-        userSettings.Delimiter = delimiter;
-        initialized = true;
-    }
-
-
-    public CsvWriter(OutputStream outputStream, char delimiter, Charset charset) {
-        this(new OutputStreamWriter(outputStream, charset), delimiter);
-    }
-
-    public char getDelimiter() {
-        return userSettings.Delimiter;
-    }
-
-
-    public void setDelimiter(char delimiter) {
-        userSettings.Delimiter = delimiter;
-    }
-
-    public char getRecordDelimiter() {
-        return userSettings.RecordDelimiter;
-    }
-
-    public void setRecordDelimiter(char recordDelimiter) {
-        useCustomRecordDelimiter = true;
-        userSettings.RecordDelimiter = recordDelimiter;
+        this(writer, DEFAULT_SEPARATOR, DEFAULT_QUOTE_CHARACTER,
+                DEFAULT_ESCAPE_CHARACTER, DEFAULT_LINE_END);
     }
 
     /**
-     * Gets the character to use as a text qualifier in the data.
+     * Constructs CSVWriter with supplied separator, quote char, escape char and line ending.
      *
-     * @return The character to use as a text qualifier in the data.
+     * @param writer
+     *            the writer to an underlying CSV source.
+     * @param separator
+     *            the delimiter to use for separating entries
+     * @param quotechar
+     *            the character to use for quoted elements
+     * @param escapechar
+     *            the character to use for escaping quotechars or escapechars
+     * @param lineEnd
+     *            the line feed terminator to use
      */
-    public char getTextQualifier() {
-        return userSettings.TextQualifier;
+    public CsvWriter(Writer writer, char separator, char quotechar, char escapechar, String lineEnd) {
+        this.pw = new PrintWriter(writer);
+        this.separator = separator;
+        this.quotechar = quotechar;
+        this.escapechar = escapechar;
+        this.lineEnd = lineEnd;
     }
 
     /**
-     * Sets the character to use as a text qualifier in the data.
+     * Writes the next line to the file.
      *
-     * @param textQualifier
-     *            The character to use as a text qualifier in the data.
+     * @param nextLine
+     *            a string array with each comma-separated element as a separate
+     *            entry.
      */
-    public void setTextQualifier(char textQualifier) {
-        userSettings.TextQualifier = textQualifier;
-    }
+    public void writeNext(String[] nextLine) {
 
-    /**
-     * Whether text qualifiers will be used while writing data or not.
-     *
-     * @return Whether text qualifiers will be used while writing data or not.
-     */
-    public boolean getUseTextQualifier() {
-        return userSettings.UseTextQualifier;
-    }
+        if (nextLine == null)
+            return;
 
-    /**
-     * Sets whether text qualifiers will be used while writing data or not.
-     *
-     * @param useTextQualifier
-     *            Whether to use a text qualifier while writing data or not.
-     */
-    public void setUseTextQualifier(boolean useTextQualifier) {
-        userSettings.UseTextQualifier = useTextQualifier;
-    }
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < nextLine.length; i++) {
 
-    public int getEscapeMode() {
-        return userSettings.EscapeMode;
-    }
-
-    public void setEscapeMode(int escapeMode) {
-        userSettings.EscapeMode = escapeMode;
-    }
-
-    public void setComment(char comment) {
-        userSettings.Comment = comment;
-    }
-
-    public char getComment() {
-        return userSettings.Comment;
-    }
-
-    /**
-     * Whether fields will be surrounded by the text qualifier even if the
-     * qualifier is not necessarily needed to escape this field.
-     *
-     * @return Whether fields will be forced to be qualified or not.
-     */
-    public boolean getForceQualifier() {
-        return userSettings.ForceQualifier;
-    }
-
-    /**
-     * Use this to force all fields to be surrounded by the text qualifier even
-     * if the qualifier is not necessarily needed to escape this field. Default
-     * is false.
-     *
-     * @param forceQualifier
-     *            Whether to force the fields to be qualified or not.
-     */
-    public void setForceQualifier(boolean forceQualifier) {
-        userSettings.ForceQualifier = forceQualifier;
-    }
-
-    /**
-     * Writes another column of data to this record.
-     *
-     * @param content
-     *            The data for the new column.
-     * @param preserveSpaces
-     *            Whether to preserve leading and trailing whitespace in this
-     *            column of data.
-     * @exception IOException
-     *                Thrown if an error occurs while writing data to the
-     *                destination stream.
-     */
-    public void write(String content, boolean preserveSpaces)
-            throws IOException {
-        checkClosed();
-
-        checkInit();
-
-        if (content == null) {
-            content = "";
-        }
-
-        if (!firstColumn) {
-            outputStream.write(userSettings.Delimiter);
-        }
-
-        boolean textQualify = userSettings.ForceQualifier;
-
-        if (!preserveSpaces && content.length() > 0) {
-            content = content.trim();
-        }
-
-        if (!textQualify
-                && userSettings.UseTextQualifier
-                && (content.indexOf(userSettings.TextQualifier) > -1
-                || content.indexOf(userSettings.Delimiter) > -1
-                || (!useCustomRecordDelimiter && (content
-                .indexOf(Letters.LF) > -1 || content
-                .indexOf(Letters.CR) > -1))
-                || (useCustomRecordDelimiter && content
-                .indexOf(userSettings.RecordDelimiter) > -1)
-                || (firstColumn && content.length() > 0 && content
-                .charAt(0) == userSettings.Comment) ||
-                // check for empty first column, which if on its own line must
-                // be qualified or the line will be skipped
-                (firstColumn && content.length() == 0))) {
-            textQualify = true;
-        }
-
-        if (userSettings.UseTextQualifier && !textQualify
-                && content.length() > 0 && preserveSpaces) {
-            char firstLetter = content.charAt(0);
-
-            if (firstLetter == Letters.SPACE || firstLetter == Letters.TAB) {
-                textQualify = true;
+            if (i != 0) {
+                sb.append(separator);
             }
 
-            if (!textQualify && content.length() > 1) {
-                char lastLetter = content.charAt(content.length() - 1);
-
-                if (lastLetter == Letters.SPACE || lastLetter == Letters.TAB) {
-                    textQualify = true;
-                }
-            }
-        }
-
-        if (textQualify) {
-            outputStream.write(userSettings.TextQualifier);
-
-            if (userSettings.EscapeMode == ESCAPE_MODE_BACKSLASH) {
-                content = replace(content, "" + Letters.BACKSLASH, ""
-                        + Letters.BACKSLASH + Letters.BACKSLASH);
-                content = replace(content, "" + userSettings.TextQualifier, ""
-                        + Letters.BACKSLASH + userSettings.TextQualifier);
-            } else {
-                content = replace(content, "" + userSettings.TextQualifier, ""
-                        + userSettings.TextQualifier
-                        + userSettings.TextQualifier);
-            }
-        } else if (userSettings.EscapeMode == ESCAPE_MODE_BACKSLASH) {
-            content = replace(content, "" + Letters.BACKSLASH, ""
-                    + Letters.BACKSLASH + Letters.BACKSLASH);
-            content = replace(content, "" + userSettings.Delimiter, ""
-                    + Letters.BACKSLASH + userSettings.Delimiter);
-
-            if (useCustomRecordDelimiter) {
-                content = replace(content, "" + userSettings.RecordDelimiter,
-                        "" + Letters.BACKSLASH + userSettings.RecordDelimiter);
-            } else {
-                content = replace(content, "" + Letters.CR, ""
-                        + Letters.BACKSLASH + Letters.CR);
-                content = replace(content, "" + Letters.LF, ""
-                        + Letters.BACKSLASH + Letters.LF);
-            }
-
-            if (firstColumn && content.length() > 0
-                    && content.charAt(0) == userSettings.Comment) {
-                if (content.length() > 1) {
-                    content = "" + Letters.BACKSLASH + userSettings.Comment
-                            + content.substring(1);
+            String nextElement = nextLine[i];
+            if (nextElement == null)
+                continue;
+            if (quotechar !=  NO_QUOTE_CHARACTER)
+                sb.append(quotechar);
+            for (int j = 0; j < nextElement.length(); j++) {
+                char nextChar = nextElement.charAt(j);
+                if (escapechar != NO_ESCAPE_CHARACTER && nextChar == quotechar) {
+                    sb.append(escapechar).append(nextChar);
+                } else if (escapechar != NO_ESCAPE_CHARACTER && nextChar == escapechar) {
+                    sb.append(escapechar).append(nextChar);
                 } else {
-                    content = "" + Letters.BACKSLASH + userSettings.Comment;
+                    sb.append(nextChar);
                 }
             }
+            if (quotechar != NO_QUOTE_CHARACTER)
+                sb.append(quotechar);
         }
 
-        outputStream.write(content);
+        sb.append(lineEnd);
+        pw.write(sb.toString());
 
-        if (textQualify) {
-            outputStream.write(userSettings.TextQualifier);
-        }
-
-        firstColumn = false;
     }
 
     /**
-     * Writes another column of data to this record.&nbsp;Does not preserve
-     * leading and trailing whitespace in this column of data.
+     * Flush underlying stream to writer.
      *
-     * @param content
-     *            The data for the new column.
-     * @exception IOException
-     *                Thrown if an error occurs while writing data to the
-     *                destination stream.
-     */
-    public void write(String content) throws IOException {
-        write(content, false);
-    }
-
-    public void writeComment(String commentText) throws IOException {
-        checkClosed();
-
-        checkInit();
-
-        outputStream.write(userSettings.Comment);
-
-        outputStream.write(commentText);
-
-        if (useCustomRecordDelimiter) {
-            outputStream.write(userSettings.RecordDelimiter);
-        } else {
-            outputStream.write(systemRecordDelimiter);
-        }
-
-        firstColumn = true;
-    }
-
-    /**
-     * Writes a new record using the passed in array of values.
-     *
-     * @param values
-     *            Values to be written.
-     *
-     * @param preserveSpaces
-     *            Whether to preserver leading and trailing spaces in columns
-     *            while writing out to the record or not.
-     *
-     * @throws IOException
-     *             Thrown if an error occurs while writing data to the
-     *             destination stream.
-     */
-    public void writeRecord(String[] values, boolean preserveSpaces)
-            throws IOException {
-        if (values != null && values.length > 0) {
-            for (int i = 0; i < values.length; i++) {
-                write(values[i], preserveSpaces);
-            }
-
-            endRecord();
-        }
-    }
-
-    /**
-     * Writes a new record using the passed in array of values.
-     *
-     * @param values
-     *            Values to be written.
-     *
-     * @throws IOException
-     *             Thrown if an error occurs while writing data to the
-     *             destination stream.
-     */
-    public void writeRecord(String[] values) throws IOException {
-        writeRecord(values, false);
-    }
-
-    /**
-     * Ends the current record by sending the record delimiter.
-     *
-     * @exception IOException
-     *                Thrown if an error occurs while writing data to the
-     *                destination stream.
-     */
-    public void endRecord() throws IOException {
-        checkClosed();
-
-        checkInit();
-
-        if (useCustomRecordDelimiter) {
-            outputStream.write(userSettings.RecordDelimiter);
-        } else {
-            outputStream.write(systemRecordDelimiter);
-        }
-
-        firstColumn = true;
-    }
-
-    /**
-     *
-     */
-    private void checkInit() throws IOException {
-        if (!initialized) {
-            if (fileName != null) {
-                outputStream = new BufferedWriter(new OutputStreamWriter(
-                        new FileOutputStream(fileName), charset));
-            }
-
-            initialized = true;
-        }
-    }
-
-    /**
-     * Clears all buffers for the current writer and causes any buffered data to
-     * be written to the underlying device.
-     * @exception IOException
-     *                Thrown if an error occurs while writing data to the
-     *                destination stream.
+     * @throws IOException if bad things happen
      */
     public void flush() throws IOException {
-        outputStream.flush();
+
+        pw.flush();
+
     }
 
     /**
-     * Closes and releases all related resources.
-     */
-    public void close() {
-        if (!closed) {
-            close(true);
-
-            closed = true;
-        }
-    }
-
-    /**
+     * Close the underlying stream writer flushing any buffered content.
+     *
+     * @throws IOException if bad things happen
      *
      */
-    private void close(boolean closing) {
-        if (!closed) {
-            if (closing) {
-                charset = null;
-            }
-
-            try {
-                if (initialized) {
-                    outputStream.close();
-                }
-            } catch (Exception e) {
-                // just eat the exception
-            }
-
-            outputStream = null;
-
-            closed = true;
-        }
+    public void close() throws IOException {
+        pw.flush();
+        pw.close();
     }
 
-    /**
-     *
-     */
-    private void checkClosed() throws IOException {
-        if (closed) {
-            throw new IOException(
-                    "This instance of the CsvWriter class has already been closed.");
-        }
-    }
-
-    /**
-     *
-     */
-    protected void finalize() {
-        close(false);
-    }
 
     private class Letters {
         public static final char LF = '\n';
@@ -563,41 +238,6 @@ public class CsvWriter {
         } else {
             return original;
         }
-    }
-    public void writeNext(String[] nextLine) {
-
-        if (nextLine == null)
-            return;
-
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < nextLine.length; i++) {
-
-            if (i != 0) {
-                sb.append(separator);
-            }
-
-            String nextElement = nextLine[i];
-            if (nextElement == null)
-                continue;
-            if (quotechar !=  NO_QUOTE_CHARACTER)
-                sb.append(quotechar);
-            for (int j = 0; j < nextElement.length(); j++) {
-                char nextChar = nextElement.charAt(j);
-                if (escapechar != NO_ESCAPE_CHARACTER && nextChar == quotechar) {
-                    sb.append(escapechar).append(nextChar);
-                } else if (escapechar != NO_ESCAPE_CHARACTER && nextChar == escapechar) {
-                    sb.append(escapechar).append(nextChar);
-                } else {
-                    sb.append(nextChar);
-                }
-            }
-            if (quotechar != NO_QUOTE_CHARACTER)
-                sb.append(quotechar);
-        }
-
-        sb.append(lineEnd);
-        pw.write(sb.toString());
-
     }
 
 }

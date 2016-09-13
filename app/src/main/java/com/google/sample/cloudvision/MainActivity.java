@@ -68,8 +68,8 @@ public class MainActivity extends AppCompatActivity {
 
         db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
         db.getWritableDatabase(); //accion a realizar, lectura o escritura.
-        ExportDatabaseCSVTask task = new ExportDatabaseCSVTask();
-        task.execute();
+        ExportDatabaseCSVTask export = new ExportDatabaseCSVTask();
+        export.execute();
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
