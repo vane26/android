@@ -25,7 +25,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
     public static String data_base = "registro_db";
     // SQLiteDatabase db;
     registroDbHelper db;
-    private final Context Context;
+    private final Context myContext;
     private static SQLiteDatabase.CursorFactory factory = null;
 
     String sqlCreate = "CREATE TABLE registro (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -33,11 +33,10 @@ public class registroDbHelper extends SQLiteOpenHelper {
     String sqlUpdate = "ALTER TABLE registro ADD COLUMN indice TEXT";
 
 
-    public registroDbHelper(Context context) {
-        super(context, data_base, factory, version);
-        this.Context = context;
-        db = new registroDbHelper(context);
-        db.crearbd();
+    public registroDbHelper(Context context, String nombre, SQLiteDatabase.CursorFactory factory, int version) {
+        super(context, nombre, factory, version);
+        this.myContext = context;
+        
 
     }
 
@@ -190,7 +189,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     public void copiabd(){
         try {
-            InputStream in = Context.getAssets().open(registroDbHelper.data_base);
+            InputStream in = myContext.getAssets().open(registroDbHelper.data_base);
             String ruta = registroDbHelper.db_path + registroDbHelper.data_base;
 
             OutputStream salida = new FileOutputStream(ruta);
