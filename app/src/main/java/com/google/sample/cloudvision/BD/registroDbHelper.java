@@ -36,7 +36,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
     public registroDbHelper(Context context, String nombre, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, nombre, factory, version);
         this.myContext = context;
-        
+
 
     }
 
@@ -189,9 +189,10 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     public void copiabd(){
         try {
+            //String currentDBPath = "/data/data/com.google.sample.cloudvision.BD/databases/registro_db";
             InputStream in = myContext.getAssets().open(registroDbHelper.data_base);
-            String ruta = registroDbHelper.db_path + registroDbHelper.data_base;
-
+           // String ruta = registroDbHelper.db_path + registroDbHelper.data_base;
+            String ruta = "/sdcard/registro.db";
             OutputStream salida = new FileOutputStream(ruta);
 
             byte[]buffer = new byte[1024];
