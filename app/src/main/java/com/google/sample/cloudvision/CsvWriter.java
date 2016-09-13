@@ -1,12 +1,12 @@
 package com.google.sample.cloudvision;
 
 /**
- * Created by Vane on 13/09/2016.
+ * Created by Vane on 12/09/2016.
  */
+
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -18,6 +18,16 @@ import java.nio.charset.Charset;
  * A stream based writer for writing delimited text data to a file or a stream.
  */
 public class CsvWriter {
+    private PrintWriter pw;
+
+    private char separator;
+
+    private char quotechar;
+
+    private char escapechar;
+
+    private String lineEnd;
+
     private Writer outputStream = null;
 
     private String fileName = null;
@@ -35,17 +45,7 @@ public class CsvWriter {
 
     private boolean closed = false;
 
-    private PrintWriter pw;
-
-    private char separator;
-
-    private char quotechar;
-
-    private char escapechar;
-
-    private String lineEnd;
-
-    /** The character used for escaping quotes. */
+    private String systemRecordDelimiter = System.getProperty("line.separator");
     public static final char DEFAULT_ESCAPE_CHARACTER = '"';
 
     /** The default separator to use if none is supplied to the constructor. */
@@ -65,8 +65,6 @@ public class CsvWriter {
 
     /** Default line terminator uses platform encoding. */
     public static final String DEFAULT_LINE_END = "\n";
-
-    private String systemRecordDelimiter = System.getProperty("line.separator");
 
     /**
      * Double up the text qualifier to represent an occurrence of the text
@@ -95,9 +93,12 @@ public class CsvWriter {
         userSettings.Delimiter = delimiter;
         this.charset = charset;
     }
+    public CsvWriter(Writer writer) {
+        this(writer, DEFAULT_SEPARATOR, DEFAULT_QUOTE_CHARACTER, DEFAULT_ESCAPE_CHARACTER, DEFAULT_LINE_END);
+    }
 
 
-    public CsvWriter(FileWriter fileName) {
+    public CsvWriter(Writer writer, char defaultSeparator, char defaultQuoteCharacter, char defaultEscapeCharacter, String fileName) {
         this(fileName, Letters.COMMA, Charset.forName("ISO-8859-1"));
     }
 
@@ -115,7 +116,6 @@ public class CsvWriter {
     public CsvWriter(OutputStream outputStream, char delimiter, Charset charset) {
         this(new OutputStreamWriter(outputStream, charset), delimiter);
     }
-
 
     public char getDelimiter() {
         return userSettings.Delimiter;
@@ -598,22 +598,6 @@ public class CsvWriter {
         sb.append(lineEnd);
         pw.write(sb.toString());
 
-    }
-    public void flushs() throws IOException {
-
-        pw.flush();
-
-    }
-
-    /**
-     * Close the underlying stream writer flushing any buffered content.
-     *
-     * @throws IOException if bad things happen
-     *
-     */
-    public void closes() throws IOException {
-        pw.flush();
-        pw.close();
     }
 
 }
