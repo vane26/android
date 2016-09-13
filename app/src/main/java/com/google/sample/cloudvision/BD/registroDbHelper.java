@@ -5,16 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * Created by Vane on 31/08/2016.
@@ -24,24 +19,21 @@ public class registroDbHelper extends SQLiteOpenHelper {
     public static int version = 2;
     public static String db_path = "/data/data/com.google.sample.cloudvision.BD/databases/";
     public static String data_base = "registro_db";
-   // SQLiteDatabase db;
+    // SQLiteDatabase db;
     registroDbHelper db;
     private final Context myContext;
     private static SQLiteDatabase.CursorFactory factory = null;
 
-
     String sqlCreate = "CREATE TABLE registro (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
             "indice TEXT, texto TEXT, calidad TEXT)";
     String sqlUpdate = "ALTER TABLE registro ADD COLUMN indice TEXT";
+
 
     public registroDbHelper(Context context, String nombre, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, nombre, factory, version);
         this.myContext = context;
 
     }
-
-
-
 
 
     @Override
@@ -166,27 +158,4 @@ public class registroDbHelper extends SQLiteOpenHelper {
         }
         return listado;
     }
-
-    public static void backupDatabase() throws IOException {
-        //Open your local db as the input stream
-        String inFileName = "/data/data/com.google.sample.cloudvision.BD/databases/registro_db";
-        File dbFile = new File(inFileName);
-        FileInputStream fis = new FileInputStream(dbFile);
-
-        String outFileName = Environment.getExternalStorageDirectory()+"/registro.txt";
-        //Open the empty db as the output stream
-        OutputStream output = new FileOutputStream(outFileName);
-        //transfer bytes from the inputfile to the outputfile
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = fis.read(buffer))>0){
-            output.write(buffer, 0, length);
-        }
-        //Close the streams
-        output.flush();
-        output.close();
-        fis.close();
-    }
-
-
 }
