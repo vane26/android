@@ -1,20 +1,20 @@
 package com.google.sample.cloudvision.BD;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
-import java.text.SimpleDateFormat;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -167,36 +167,12 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
-    public void backupdDatabase(){
-        try {
-            File sd = Environment.getExternalStorageDirectory();
-            File data = Environment.getDataDirectory();
-            String packageName  = "com.google.sample.cloudvision.BD";
-            String sourceDBName = "registro_db";
-            String targetDBName = "registro";
-            if (sd.canWrite()) {
-                Date now = new Date();
-                String currentDBPath = "data/" + packageName + "/databases/" + sourceDBName;
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
-                String backupDBPath = targetDBName + dateFormat.format(now) + ".db";
-
-                File currentDB = new File(data, currentDBPath);
-                File backupDB = new File(sd, backupDBPath);
-
-                Log.i("backup","backupDB=" + backupDB.getAbsolutePath());
-                Log.i("backup","sourceDB=" + currentDB.getAbsolutePath());
-
-                FileChannel src = new FileInputStream(currentDB).getChannel();
-                FileChannel dst = new FileOutputStream(backupDB).getChannel();
-                dst.transferFrom(src, 0, src.size());
-                src.close();
-                dst.close();
-            }
-        } catch (Exception e) {
-            Log.i("Backup", e.toString());
-        }
-    }
 
 
 
 }
+
+
+
+
+
