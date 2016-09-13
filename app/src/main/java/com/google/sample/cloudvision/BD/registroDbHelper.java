@@ -7,6 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +25,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
     public static String data_base = "registro_db";
     // SQLiteDatabase db;
     registroDbHelper db;
-    private final Context myContext;
+    private final Context Context;
     private static SQLiteDatabase.CursorFactory factory = null;
 
     String sqlCreate = "CREATE TABLE registro (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -29,9 +33,11 @@ public class registroDbHelper extends SQLiteOpenHelper {
     String sqlUpdate = "ALTER TABLE registro ADD COLUMN indice TEXT";
 
 
-    public registroDbHelper(Context context, String nombre, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, nombre, factory, version);
-        this.myContext = context;
+    public registroDbHelper(Context context) {
+        super(context, data_base, factory, version);
+        this.Context = context;
+        db = new registroDbHelper(context);
+        db.crearbd();
 
     }
 
@@ -157,5 +163,48 @@ public class registroDbHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         return listado;
+    }
+
+
+
+
+
+    private boolean compruebadb(){
+        boolean checkdb = false;
+        String patch = registroDbHelper.db_path + registroDbHelper.data_base;
+        File ficherodb = new File(patch);
+        checkdb = ficherodb.exists();
+        return checkdb;
+    }
+
+
+    public void crearbd(){
+        boolean existe = compruebadb();
+        if(existe){
+
+        }else {
+            this.getWritableDatabase();
+            copiabd();
+        }
+    }
+
+    public void copiabd(){
+        try {
+            InputStream in = Context.getAssets().open(registroDbHelper.data_base);
+            String ruta = registroDbHelper.db_path + registroDbHelper.data_base;
+
+            OutputStream salida = new FileOutputStream(ruta);
+
+            byte[]buffer = new byte[1024];
+            int tam;
+            while ((tam = in.read(buffer)) > 0){
+                salida.write(buffer, 0, tam);
+            }
+            salida.flush();
+            salida.close();
+            in.close();
+        }catch (Exception e){
+
+        }
     }
 }
