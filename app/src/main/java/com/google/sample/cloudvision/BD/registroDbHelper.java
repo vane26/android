@@ -5,13 +5,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -36,7 +39,6 @@ public class registroDbHelper extends SQLiteOpenHelper {
     public registroDbHelper(Context context, String nombre, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, nombre, factory, version);
         this.myContext = context;
-
 
     }
 
@@ -165,46 +167,36 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
-
-
-
-    private boolean compruebadb(){
-        boolean checkdb = false;
-        String patch = registroDbHelper.db_path + registroDbHelper.data_base;
-        File ficherodb = new File(patch);
-        checkdb = ficherodb.exists();
-        return checkdb;
-    }
-
-
-    public void crearbd(){
-        boolean existe = compruebadb();
-        if(existe){
-
-        }else {
-            this.getWritableDatabase();
-            copiabd();
-        }
-    }
-
-    public void copiabd(){
+    public void backupdDatabase(){
         try {
-            //String currentDBPath = "/data/data/com.google.sample.cloudvision.BD/databases/registro_db";
-            InputStream in = myContext.getAssets().open(registroDbHelper.data_base);
-           // String ruta = registroDbHelper.db_path + registroDbHelper.data_base;
-            String ruta = "/sdcard/registro.db";
-            OutputStream salida = new FileOutputStream(ruta);
+            File sd = Environment.getExternalStorageDirectory();
+            File data = Environment.getDataDirectory();
+            String packageName  = "com.google.sample.cloudvision.BD";
+            String sourceDBName = "registro_db";
+            String targetDBName = "registro";
+            if (sd.canWrite()) {
+                Date now = new Date();
+                String currentDBPath = "data/" + packageName + "/databases/" + sourceDBName;
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+                String backupDBPath = targetDBName + dateFormat.format(now) + ".db";
 
-            byte[]buffer = new byte[1024];
-            int tam;
-            while ((tam = in.read(buffer)) > 0){
-                salida.write(buffer, 0, tam);
+                File currentDB = new File(data, currentDBPath);
+                File backupDB = new File(sd, backupDBPath);
+
+                Log.i("backup","backupDB=" + backupDB.getAbsolutePath());
+                Log.i("backup","sourceDB=" + currentDB.getAbsolutePath());
+
+                FileChannel src = new FileInputStream(currentDB).getChannel();
+                FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                dst.transferFrom(src, 0, src.size());
+                src.close();
+                dst.close();
             }
-            salida.flush();
-            salida.close();
-            in.close();
-        }catch (Exception e){
-
+        } catch (Exception e) {
+            Log.i("Backup", e.toString());
         }
     }
+
+
+
 }
