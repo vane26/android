@@ -174,12 +174,12 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
 
         try {
-            archivoDB = Environment.getExternalStorageDirectory();
+            File raiz = Environment.getExternalStorageDirectory();
             if (archivoDB.canWrite()) {
-                File file = new File(archivoDB, "registro.csv");
+                File file = new File(raiz, "registro.csv");
                 BufferedWriter out = new BufferedWriter(new
                         FileWriter(file));
-                out.write("Mi texto escrito desde Android\n");
+                out.write("Mi texto escrito desde Android\n" + archivoDB);
                 out.close();
             }
         } catch (IOException e) {
