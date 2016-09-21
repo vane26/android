@@ -168,10 +168,15 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
 
     public void sd() {
+        String ruta = "/data/data/com.google.sample.cloudvision.BD/databases/";
+        String archivo = "registro_db";
+        File archivoDB = new File(ruta + archivo);
+
+
         try {
-            File raiz = Environment.getExternalStorageDirectory();
-            if (raiz.canWrite()) {
-                File file = new File(raiz, "registro_db");
+            archivoDB = Environment.getExternalStorageDirectory();
+            if (archivoDB.canWrite()) {
+                File file = new File(archivoDB, "registro.csv");
                 BufferedWriter out = new BufferedWriter(new
                         FileWriter(file));
                 out.write("Mi texto escrito desde Android\n");
