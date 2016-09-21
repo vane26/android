@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         db = new registroDbHelper(this);
-        db.openDataBase();
+        //db.openDataBase();
         db.getWritableDatabase(); //accion a realizar, lectura o escritura.
         db.createDataBase();
 
