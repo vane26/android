@@ -17,11 +17,11 @@ import java.util.List;
 
 public class registroDbHelper extends SQLiteOpenHelper {
     public static int version = 2;
-    public static String db_path = "/data/data/com.google.sample.cloudvision.BD/databases/";
+   // public static String db_path = "/data/data/com.google.sample.cloudvision.BD/databases/";
     public static String data_base = "registro_db";
     // SQLiteDatabase db;
     registroDbHelper db;
-    private final Context myContext;
+    //private final Context myContext;
     private static SQLiteDatabase.CursorFactory factory = null;
 
     String sqlCreate = "CREATE TABLE registro (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -29,10 +29,9 @@ public class registroDbHelper extends SQLiteOpenHelper {
     String sqlUpdate = "ALTER TABLE registro ADD COLUMN indice TEXT";
 
 
-    public registroDbHelper(Context context, String nombre, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, nombre, factory, version);
-        this.myContext = context;
-        SQLiteDatabase.openOrCreateDatabase("/mnt/sdcard/"+nombre,null);
+    public registroDbHelper(Context context) {
+        super(context, data_base, null, version);
+        SQLiteDatabase.openOrCreateDatabase("/mnt/sdcard/"+data_base,null);
 
     }
 

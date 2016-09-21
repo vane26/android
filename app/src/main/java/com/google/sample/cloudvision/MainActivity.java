@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
+        db = new registroDbHelper(this);
         db.getWritableDatabase(); //accion a realizar, lectura o escritura.
 
 
