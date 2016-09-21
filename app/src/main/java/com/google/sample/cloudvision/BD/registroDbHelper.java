@@ -32,6 +32,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
     public registroDbHelper(Context context, String nombre, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, nombre, factory, version);
         this.myContext = context;
+        SQLiteDatabase.openOrCreateDatabase("/mnt/sdcard/"+nombre,null);
 
     }
 
@@ -161,7 +162,20 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
-}
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
 
 
 

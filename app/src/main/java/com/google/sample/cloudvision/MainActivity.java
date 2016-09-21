@@ -42,11 +42,7 @@ import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
 
         db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
         db.getWritableDatabase(); //accion a realizar, lectura o escritura.
-        MainActivity copia = new MainActivity();
-        copia.copiarBaseDatos();
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -139,31 +133,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void copiarBaseDatos() {
-        String ruta = "/data/data/com.google.sample.cloudvision.BD/databases/";
-        String archivo = "registro_db";
-        File archivoDB = new File(ruta + archivo);
-        if (!archivoDB.exists()) {
-            try {
-                InputStream IS = getApplicationContext().getAssets().open(archivo);
-                OutputStream OS = new FileOutputStream(archivoDB);
-                byte[] buffer = new byte[1024];
-                int length = 0;
-                while ((length = IS.read(buffer)) > 0) {
-                    OS.write(buffer, 0, length);
-                }
-                OS.flush();
-                OS.close();
-                IS.close();
-            } catch (FileNotFoundException e) {
-                Log.e("ERROR", "Archivo no encontrado, " + e.toString());
-            } catch (IOException e) {
-                Log.e("ERROR", "Error al copiar la Base de Datos, " + e.toString());
-            }
 
-        }
-
-    }
 
     public File getCameraFile() {
         File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
