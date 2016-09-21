@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
@@ -40,12 +39,11 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     public registroDbHelper(Context context) {
         super(context, data_base, factory, version);
-        db_path = Environment.getExternalStorageDirectory() + context.getPackageName() + "/registro_db.csv/";
+        db_path = "/mnt/sdcard/" + context.getPackageName() + "/registro_db.csv/";
         this.myContext = context;
 
 
     }
-    
 
     public void createDataBase(){
         //If database not exists copy it from the assets
