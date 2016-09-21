@@ -5,13 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
 import android.util.Log;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
     public registroDbHelper(Context context, String nombre, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, nombre, factory, version);
         this.myContext = context;
-        SQLiteDatabase.openOrCreateDatabase("/mnt/sdcard/" + nombre, null);
+        //SQLiteDatabase.openOrCreateDatabase("/mnt/sdcard/" + nombre, null);
 
     }
 
@@ -168,24 +167,42 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
 
     public void sd() {
-        String ruta = "/data/data/com.google.sample.cloudvision.BD/databases/";
-        String archivo = "registro_db";
-        File archivoDB = new File(ruta + archivo);
+        copia ("/data/data/com.google.sample.cloudvision.BD/databases/registro_db", "/mnt/sdcard/registro.csv");
+    }
 
+    public static void copia (String ficheroOriginal, String ficheroCopia)
+    {
+        try
+        {
+            // Se abre el fichero original para lectura
+            FileInputStream fileInput = new FileInputStream(ficheroOriginal);
+            BufferedInputStream bufferedInput = new BufferedInputStream(fileInput);
 
-        try {
-            File raiz = Environment.getExternalStorageDirectory();
-            if (archivoDB.canWrite()) {
-                File file = new File(raiz, "registro.csv");
-                BufferedWriter out = new BufferedWriter(new
-                        FileWriter(file));
-                out.write("Mi texto escrito desde Android\n" + archivoDB);
-                out.close();
+            // Se abre el fichero donde se hará la copia
+            FileOutputStream fileOutput = new FileOutputStream(ficheroCopia);
+            BufferedOutputStream bufferedOutput = new BufferedOutputStream(fileOutput);
+
+            // Bucle para leer de un fichero y escribir en el otro.
+            byte [] array = new byte[1000];
+            int leidos = bufferedInput.read(array);
+            while (leidos > 0)
+            {
+                bufferedOutput.write(array,0,leidos);
+                leidos=bufferedInput.read(array);
             }
-        } catch (IOException e) {
-            Log.e("FILE I/O", "Error en la escritura de fichero: " +
-                    e.getMessage());
+
+            // Cierre de los ficheros
+            bufferedInput.close();
+            bufferedOutput.close();
         }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+
     }
 
 
