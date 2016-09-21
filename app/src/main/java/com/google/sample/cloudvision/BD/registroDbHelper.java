@@ -45,6 +45,62 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
 
     }
+    
+
+    public void createDataBase(){
+        //If database not exists copy it from the assets
+
+        boolean mDataBaseExist = checkDataBase();
+        if(!mDataBaseExist)
+        {
+            this.getReadableDatabase();
+            this.close();
+            try
+            {
+                //Copy the database from assests
+                copyDataBase();
+                Log.e(data_base, "createDatabase database created");
+            }
+            catch (IOException mIOException)
+            {
+                throw new Error("ErrorCopyingDataBase");
+            }
+        }
+    }
+    //Check that the database exists here: /data/data/your package/databases/Da Name
+    private boolean checkDataBase()
+    {
+        File dbFile = new File(db_path + data_base);
+        //Log.v("dbFile", dbFile + "   "+ dbFile.exists());
+        return dbFile.exists();
+    }
+
+    //Copy the database from assets
+    private void copyDataBase() throws IOException
+    {
+        InputStream mInput = myContext.getAssets().open(data_base);
+        String outFileName = db_path + data_base;
+        OutputStream mOutput = new FileOutputStream(outFileName);
+        byte[] mBuffer = new byte[1024];
+        int mLength;
+        while ((mLength = mInput.read(mBuffer))>0)
+        {
+            mOutput.write(mBuffer, 0, mLength);
+        }
+        mOutput.flush();
+        mOutput.close();
+        mInput.close();
+    }
+
+    //Open the database, so we can query it
+    public boolean openDataBase() throws SQLException
+    {
+        String mPath = db_path + data_base;
+        //Log.v("mPath", mPath);
+        mDataBase = SQLiteDatabase.openDatabase(mPath, null, SQLiteDatabase.CREATE_IF_NECESSARY);
+        //mDataBase = SQLiteDatabase.openDatabase(mPath, null, SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+        return mDataBase != null;
+    }
 
 
 
@@ -175,11 +231,29 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
 
 
+    /*
+    public void sd() {
+        String ruta = "/data/data/com.google.sample.cloudvision.BD/databases/registro_db";
+
+        File archivoDB; = new File(ruta);
+
+        try {
 
 
-
-
+            archivoDB = Environment.getExternalStorageDirectory();
+            if (archivoDB.canWrite()) {
+                File file = new File(archivoDB, "registro.csv");
+                BufferedWriter out = new BufferedWriter(new
+                        FileWriter(file));
+                out.write("Mi texto escrito desde Android\n");
+                out.close();
+            }
+        } catch (IOException e) {
+            Log.e("FILE I/O", "Error en la escritura de fichero: " +
+                    e.getMessage());
+        }
     }
+*/
 
 }
 
