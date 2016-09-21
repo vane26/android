@@ -3,14 +3,17 @@ package com.google.sample.cloudvision.BD;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,10 +24,12 @@ import java.util.List;
 
 public class registroDbHelper extends SQLiteOpenHelper {
     public static int version = 2;
-    public static String db_path = "/data/data/com.google.sample.cloudvision.BD/databases/";
+    public static String db_path = "";
     public static String data_base = "registro_db";
     // SQLiteDatabase db;
     registroDbHelper db;
+    private SQLiteDatabase mDataBase;
+
     private final Context myContext;
     private static SQLiteDatabase.CursorFactory factory = null;
 
@@ -33,12 +38,15 @@ public class registroDbHelper extends SQLiteOpenHelper {
     String sqlUpdate = "ALTER TABLE registro ADD COLUMN indice TEXT";
 
 
-    public registroDbHelper(Context context, String nombre, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, nombre, factory, version);
+    public registroDbHelper(Context context) {
+        super(context, data_base, factory, version);
+        db_path = Environment.getExternalStorageDirectory() + context.getPackageName() + "/registro_db.csv/";
         this.myContext = context;
-        //SQLiteDatabase.openOrCreateDatabase("/mnt/sdcard/" + nombre, null);
+
 
     }
+
+
 
 
     @Override
@@ -166,45 +174,12 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
-    public void sd() {
-        copia ("/data/data/com.google.sample.cloudvision.BD/databases/registro_db", "/mnt/sdcard/registro.csv");
-    }
 
-    public static void copia (String ficheroOriginal, String ficheroCopia)
-    {
-        try
-        {
-            // Se abre el fichero original para lectura
-            FileInputStream fileInput = new FileInputStream(ficheroOriginal);
-            BufferedInputStream bufferedInput = new BufferedInputStream(fileInput);
 
-            // Se abre el fichero donde se hará la copia
-            FileOutputStream fileOutput = new FileOutputStream(ficheroCopia);
-            BufferedOutputStream bufferedOutput = new BufferedOutputStream(fileOutput);
-
-            // Bucle para leer de un fichero y escribir en el otro.
-            byte [] array = new byte[1000];
-            int leidos = bufferedInput.read(array);
-            while (leidos > 0)
-            {
-                bufferedOutput.write(array,0,leidos);
-                leidos=bufferedInput.read(array);
-            }
-
-            // Cierre de los ficheros
-            bufferedInput.close();
-            bufferedOutput.close();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
 
 
 
     }
-
 
 }
 
