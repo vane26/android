@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int GALLERY_IMAGE_REQUEST = 1;
     public static final int CAMERA_PERMISSIONS_REQUEST = 2;
     public static final int CAMERA_IMAGE_REQUEST = 3;
+    public static final int EXTERNAL_IMAGE_REQUEST = 4;
     registroDbHelper db;
     private TextView mImageDetails;
     private ImageView mMainImage;
@@ -71,18 +72,19 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-
         db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
         db.getWritableDatabase(); //accion a realizar, lectura o escritura.
+        MainActivity copia = new MainActivity();
+        copia.copiarBaseDatos();
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
         fab.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View view) {
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+         @Override
+          public void onClick(View view) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder
                         .setMessage(R.string.dialog_select_prompt)
                         .setPositiveButton(R.string.dialog_select_gallery, new DialogInterface.OnClickListener() {
@@ -96,6 +98,9 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
                             }
+
+
+
                         });
                 builder.create().show();
             }
@@ -107,8 +112,12 @@ public class MainActivity extends AppCompatActivity {
         mMainImage = (ImageView) findViewById(R.id.main_image);
 
 
+}
 
-    }
+
+
+
+
 
     public void startGalleryChooser() {
         Intent intent = new Intent();
@@ -128,6 +137,32 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getCameraFile()));
             startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
         }
+    }
+
+    public void copiarBaseDatos() {
+        String ruta = "/data/data/com.google.sample.cloudvision.BD/databases/";
+        String archivo = "registro_db";
+        File archivoDB = new File(ruta + archivo);
+        if (!archivoDB.exists()) {
+            try {
+                InputStream IS = getApplicationContext().getAssets().open(archivo);
+                OutputStream OS = new FileOutputStream(archivoDB);
+                byte[] buffer = new byte[1024];
+                int length = 0;
+                while ((length = IS.read(buffer)) > 0) {
+                    OS.write(buffer, 0, length);
+                }
+                OS.flush();
+                OS.close();
+                IS.close();
+            } catch (FileNotFoundException e) {
+                Log.e("ERROR", "Archivo no encontrado, " + e.toString());
+            } catch (IOException e) {
+                Log.e("ERROR", "Error al copiar la Base de Datos, " + e.toString());
+            }
+
+        }
+
     }
 
     public File getCameraFile() {
@@ -330,28 +365,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void copiarBaseDatos() {
-        String ruta = "/data/data/com.google.sample.cloudvision.BD/databases/";
-        String archivo = "registro.db";
-        File archivoDB = new File(ruta + archivo);
-        if (!archivoDB.exists()) {
-            try {
-                InputStream IS = getApplicationContext().getAssets().open(archivo);
-                OutputStream OS = new FileOutputStream(archivoDB);
-                byte[] buffer = new byte[1024];
-                int length = 0;
-                while ((length = IS.read(buffer)) > 0) {
-                    OS.write(buffer, 0, length);
-                }
-                OS.flush();
-                OS.close();
-                IS.close();
-            } catch (FileNotFoundException e) {
-                Log.e("ERROR", "Archivo no encontrado, " + e.toString());
-            } catch (IOException e) {
-                Log.e("ERROR", "Error al copiar la Base de Datos, " + e.toString());
-            }
-        }
-    }
+
+
+
 
 }
+
+
+

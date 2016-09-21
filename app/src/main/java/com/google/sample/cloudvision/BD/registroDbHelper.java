@@ -1,6 +1,5 @@
 package com.google.sample.cloudvision.BD;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -8,12 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,13 +56,14 @@ public class registroDbHelper extends SQLiteOpenHelper {
     //conexiones
     public void abrir() {
         Log.i("SQLite ", "Se abre conexion a la base de datos " + db.getWritableDatabase());
-        db.close();
+
     }
 
 
-    public void cerrar() {
-        Log.i("SQLite ", "Se cierra conexion a la base de datos " + db.getDatabaseName());
-        db.close();
+    public void close() {
+        if (db != null)
+            Log.i("SQLite ", "Se cierra conexion a la base de datos ");
+            db.close();
     }
 
 
@@ -165,9 +159,6 @@ public class registroDbHelper extends SQLiteOpenHelper {
         }
         return listado;
     }
-
-
-
 
 
 }
