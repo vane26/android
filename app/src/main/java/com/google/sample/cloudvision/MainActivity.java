@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int GALLERY_IMAGE_REQUEST = 1;
     public static final int CAMERA_PERMISSIONS_REQUEST = 2;
     public static final int CAMERA_IMAGE_REQUEST = 3;
-    public static final int EXTERNAL_IMAGE_REQUEST = 4;
     registroDbHelper db;
     private TextView mImageDetails;
     private ImageView mMainImage;
@@ -68,10 +67,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        db = new registroDbHelper(this);
-        //db.openDataBase();
+        db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
         db.getWritableDatabase(); //accion a realizar, lectura o escritura.
-        db.createDataBase();
+
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
