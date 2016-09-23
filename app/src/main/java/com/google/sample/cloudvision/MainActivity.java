@@ -74,9 +74,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
-        db.getWritableDatabase(); //accion a realizar, lectura o escritura.
+        //db.getWritableDatabase(); //accion a realizar, lectura o escritura.
 
-       
+
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
 
@@ -350,6 +350,7 @@ public class MainActivity extends AppCompatActivity {
                 message += String.format("%.3f: %s", label.getScore(), label.getDescription());
                 message += "\n";
 
+
             }
         } else {
             message += "nothing";
@@ -361,8 +362,8 @@ public class MainActivity extends AppCompatActivity {
             for (EntityAnnotation text : texts) {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
-                registro reg = new registro(message);
-                db.insert(reg);
+                db.agregar(message);
+
 
 
             }
@@ -378,6 +379,8 @@ public class MainActivity extends AppCompatActivity {
             for (EntityAnnotation landmark : landmarks) {
                 message += String.format("%.3f: %s", landmark.getScore(), landmark.getDescription());
                 message += "\n";
+                registro reg = new registro(message);
+                //db.agregar(message);
             }
         } else {
             message += "nothing";
