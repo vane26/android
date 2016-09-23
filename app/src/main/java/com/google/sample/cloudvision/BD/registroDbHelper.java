@@ -12,10 +12,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -213,30 +213,35 @@ public class registroDbHelper extends SQLiteOpenHelper {
         return false;
     }
 
-    public void writeFile(String filename, String textfile){
+    public void writeFile(String filename, String textfile) {
         try {
             if (isExternalStorageAvailable() && !isExternalStorageReadOnly()) {
-                File file = new File(Environment.getExternalStorageDirectory(), filename );
+                File file = new File(Environment.getExternalStorageDirectory(), filename);
                 OutputStreamWriter outw = new OutputStreamWriter(new FileOutputStream(file));
                 outw.write(textfile);
                 outw.close();
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
-    public String readFile(String filename){
-        try{
-            if(isExternalStorageAvailable()){
+    public String readFile(String filename) {
+        try {
+            if (isExternalStorageAvailable()) {
                 File file = new File(Environment.getExternalStorageDirectory(), filename);
                 BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
                 String t = br.readLine();
                 br.close();
                 return t;
-            } else {return "";}
-        } catch(Exception e){return "";}
+            } else {
+                return "";
+            }
+        } catch (Exception e) {
+            return "";
+        }
     }
 
-
+/*
     public void ruta() throws IOException {
         File ruta1 = new File(db_path + data_base);
         File ruta2 = Environment.getExternalStorageDirectory();
@@ -266,8 +271,51 @@ public class registroDbHelper extends SQLiteOpenHelper {
         }
 
         }
+*/
 
-    }
+    public static void CopiarDirectorio(File dirOrigen, File dirDestino) throws Exception {
+        try {
+            if (dirOrigen.isDirectory()) {
+                if (!dirDestino.exists())
+                    dirDestino.mkdir();
+
+                String[] hijos = dirOrigen.list();
+                for (int i = 0; i < hijos.length; i++) {
+                    CopiarDirectorio(new File(dirOrigen, hijos[i]),
+                            new File(dirDestino, hijos[i]));
+                } // end for
+            } else {
+                Copiar(dirOrigen, dirDestino);
+            } // end if
+        } catch (Exception e) {
+            throw e;
+        } // end try
+    } // end CopiarDirectorio
+
+    public static void Copiar(File dirOrigen, File dirDestino) throws Exception {
+
+        InputStream in = new FileInputStream(dirOrigen);
+        OutputStream out = new FileOutputStream(dirDestino);
+
+        byte[] buffer = new byte[1024];
+        int len;
+
+        try {
+            // recorrer el array de bytes y recomponerlo
+            while ((len = in.read(buffer)) > 0) {
+                out.write(buffer, 0, len);
+            } // end while
+            out.flush();
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            in.close();
+            out.close();
+        } // end ty
+    } // end Copiar
+
+
+}
 
 
 

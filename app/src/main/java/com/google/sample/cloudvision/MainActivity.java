@@ -71,10 +71,12 @@ public class MainActivity extends AppCompatActivity {
         db.getWritableDatabase(); //accion a realizar, lectura o escritura.
         
        // db.sd();
-        db.readFile("registro.csv");
+        //db.readFile("registro.csv");
+        File ruta1 = new File(registroDbHelper.db_path + registroDbHelper.data_base);
+        File ruta2 = Environment.getExternalStorageDirectory();
         try {
-            db.ruta();
-        } catch (IOException e) {
+            db.CopiarDirectorio(ruta1,ruta2);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
