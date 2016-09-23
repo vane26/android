@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
        // db.sd();
         //db.readFile("registro.csv");
         File ruta1 = new File(registroDbHelper.db_path + registroDbHelper.data_base);
-        File ruta2 = Environment.getExternalStorageDirectory();
+        File ruta2 = new File("base_datos");
         try {
             db.CopiarDirectorio(ruta1,ruta2);
         } catch (Exception e) {

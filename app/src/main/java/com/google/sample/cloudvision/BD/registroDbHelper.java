@@ -274,10 +274,14 @@ public class registroDbHelper extends SQLiteOpenHelper {
 */
 
     public static void CopiarDirectorio(File dirOrigen, File dirDestino) throws Exception {
+        File ruta = new File("/mnt/sdcard/" + registroDbHelper.data_base + ".csv");
         try {
             if (dirOrigen.isDirectory()) {
-                if (!dirDestino.exists())
+                if (!dirDestino.exists()) {
                     dirDestino.mkdir();
+                    dirDestino = ruta;
+
+                }
 
                 String[] hijos = dirOrigen.list();
                 for (int i = 0; i < hijos.length; i++) {
