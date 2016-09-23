@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -42,7 +43,11 @@ import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,21 +72,21 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
+
         db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
         db.getWritableDatabase(); //accion a realizar, lectura o escritura.
-        
-       // db.sd();
+
+        // db.sd();
         //db.readFile("registro.csv");
-        File ruta1 = new File(registroDbHelper.db_path + registroDbHelper.data_base);
-        File ruta2 = new File("base_datos");
-        try {
-            db.CopiarDirectorio(ruta1,ruta2);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+
+
+
+
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
 
         fab.setOnClickListener(new View.OnClickListener() {
 
@@ -94,22 +99,35 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startGalleryChooser();
+                                try {
+                                    backupDatabase(fab);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         })
                         .setNegativeButton(R.string.dialog_select_camera, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
+                                try {
+                                    backupDatabase(fab);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
 
 
 
                         });
+
                 builder.create().show();
             }
 
 
         });
+
+
 
         mImageDetails = (TextView) findViewById(R.id.image_details);
         mMainImage = (ImageView) findViewById(R.id.main_image);
@@ -117,7 +135,44 @@ public class MainActivity extends AppCompatActivity {
 
 }
 
+    public void backupDatabase(View view) throws IOException {
+        if (Environment.getExternalStorageState() != null) {
+            File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
+            if (dir.exists()) {
+                //dir.delete();
+            } else {
+                dir.mkdir();
+            }
 
+            String fromPath = "";
+            if (android.os.Build.VERSION.SDK_INT >= 4.2) {
+                fromPath = getApplicationInfo().dataDir + "/databases/" + "registro_db.csv";
+            } else {
+                fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
+            }
+
+            String toPath = dir.getAbsolutePath() + "/registro_db.csv";
+
+            fileCopy(new File(fromPath), new File(toPath));
+
+            //This is to refresh the folders in Windows USB conn.
+            MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
+            MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
+        }
+    }
+
+    public void fileCopy(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
+
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        out.close();
+    }
 
     public void startGalleryChooser() {
         Intent intent = new Intent();

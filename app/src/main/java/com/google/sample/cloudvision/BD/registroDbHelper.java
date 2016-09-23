@@ -29,6 +29,8 @@ public class registroDbHelper extends SQLiteOpenHelper {
     public static int version = 2;
     public static String db_path = "/data/data/com.google.sample.cloudvision.BD/databases/";
     public static String data_base = "registro_db.csv";
+  
+
     // SQLiteDatabase db;
     registroDbHelper db;
     private final Context myContext;
@@ -231,6 +233,8 @@ public class registroDbHelper extends SQLiteOpenHelper {
                 File file = new File(Environment.getExternalStorageDirectory(), filename);
                 BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
                 String t = br.readLine();
+
+
                 br.close();
                 return t;
             } else {
@@ -273,13 +277,14 @@ public class registroDbHelper extends SQLiteOpenHelper {
         }
 */
 
-    public static void CopiarDirectorio(File dirOrigen, File dirDestino) throws Exception {
-        File ruta = new File("/mnt/sdcard/" + registroDbHelper.data_base + ".csv");
+
+    public static void CopiarDirectorio(File dirOrigen,File dirDestino) throws Exception {
+
         try {
             if (dirOrigen.isDirectory()) {
                 if (!dirDestino.exists()) {
                     dirDestino.mkdir();
-                    dirDestino = ruta;
+
 
                 }
 
