@@ -5,8 +5,17 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +25,7 @@ import java.util.List;
  */
 
 public class registroDbHelper extends SQLiteOpenHelper {
+    private static final String TAG = "";
     public static int version = 2;
     public static String db_path = "/data/data/com.google.sample.cloudvision.BD/databases/";
     public static String data_base = "registro_db.csv";
@@ -162,9 +172,106 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
-    
+    /*
+    public void sd(){
+        try {
+            File root = Environment.getExternalStorageDirectory();
+            Log.i(TAG,"path.." +root.getAbsolutePath());
 
-}
+            //check sdcard permission
+            if (root.canWrite()) {
+                File fileDir = new File(root.getAbsolutePath()+"/fun/");
+                fileDir.mkdirs();
+
+                //   Log.d("DATABASE", db.getAllBYname());
+
+                File file= new File(fileDir, "registro.csv");
+                FileWriter filewriter = new FileWriter(file);
+                BufferedWriter out = new BufferedWriter(filewriter);
+
+                out.write("I m enjoying......dude..............."  );
+                out.close();
+            }
+        } catch (IOException e) {
+            Log.e("ERROR:---", "Could not write file to SDCard" + e.getMessage());
+        }
+    }
+*/
+    public static boolean isExternalStorageReadOnly() {
+        String extStorageState = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(extStorageState)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isExternalStorageAvailable() {
+        String extStorageState = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(extStorageState)) {
+            return true;
+        }
+        return false;
+    }
+
+    public void writeFile(String filename, String textfile){
+        try {
+            if (isExternalStorageAvailable() && !isExternalStorageReadOnly()) {
+                File file = new File(Environment.getExternalStorageDirectory(), filename );
+                OutputStreamWriter outw = new OutputStreamWriter(new FileOutputStream(file));
+                outw.write(textfile);
+                outw.close();
+            }
+        } catch (Exception e) {}
+    }
+
+    public String readFile(String filename){
+        try{
+            if(isExternalStorageAvailable()){
+                File file = new File(Environment.getExternalStorageDirectory(), filename);
+                BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+                String t = br.readLine();
+                br.close();
+                return t;
+            } else {return "";}
+        } catch(Exception e){return "";}
+    }
+
+
+    public void ruta() throws IOException {
+        File ruta1 = new File(db_path + data_base);
+        File ruta2 = Environment.getExternalStorageDirectory();
+
+        if (!ruta1.exists()){
+            ruta1.createNewFile();
+
+        }
+        FileChannel origen = null;
+        FileChannel destino = null;
+
+        try {
+            origen = new FileInputStream(ruta1).getChannel();
+            destino = new FileOutputStream(ruta2).getChannel();
+
+            long count = 0;
+            long size = origen.size();
+            while ((count += destino.transferFrom(origen, count, size-count))<size);
+        }
+        finally {
+            if(origen != null) {
+                origen.close();
+            }
+            if(destino != null) {
+                destino.close();
+            }
+        }
+
+        }
+
+    }
+
+
+
+
 
 
 

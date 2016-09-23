@@ -69,7 +69,14 @@ public class MainActivity extends AppCompatActivity {
 
         db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
         db.getWritableDatabase(); //accion a realizar, lectura o escritura.
-
+        
+       // db.sd();
+        db.readFile("registro.csv");
+        try {
+            db.ruta();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -107,9 +114,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 }
-
-
-
 
 
 
