@@ -378,15 +378,6 @@ public class MainActivity extends AppCompatActivity {
                 //db.agregar(message);
 
 
-            if(Inicio <= Termino)
-                db.agregar(message);
-
-
-            totalTiempo = Termino - Inicio;
-
-
-                //long duracion = termino.getTime() - inicio.getTime();
-            System.out.println("Tiempo demorado:\t" + totalTiempo + " nanosegundos.");
 
 
             }
@@ -408,6 +399,18 @@ public class MainActivity extends AppCompatActivity {
         } else {
             message += "nothing";
         }
+
+        if(Inicio <= Termino)
+            db.agregar(message);
+
+
+        totalTiempo = Termino - Inicio;
+
+
+        //long duracion = termino.getTime() - inicio.getTime();
+        System.out.println("Tiempo demorado:\t" + totalTiempo + " nanosegundos.");
+
+
 
         return message;
 
