@@ -49,7 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -342,15 +342,23 @@ public class MainActivity extends AppCompatActivity {
 
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
         String message = "I found these things:\n\n";
-       // long totalTiempo;
-        //long tiempoInicio;
-        //tiempoInicio = System.currentTimeMillis();
-        //totalTiempo = System.currentTimeMillis() - tiempoInicio;
 
-        Date inicio = new Date();
-        Date termino = new Date();
+        long totalTiempo;
+        long Inicio;
+        long Termino;
 
-        long duracion = termino.getTime() - inicio.getTime();
+        Calendar ahora1 = Calendar.getInstance();
+        Inicio = ahora1.getTimeInMillis();
+
+        Calendar ahora2 = Calendar.getInstance();
+        Termino = ahora2.getTimeInMillis();
+
+        totalTiempo = Termino - Inicio;
+
+       // Date inicio = new Date();
+       // Date termino = new Date();
+
+        //long duracion = termino.getTime() - inicio.getTime();
 
         List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
         if (labels != null) {
@@ -371,14 +379,13 @@ public class MainActivity extends AppCompatActivity {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
                 //db.agregar(message);
-               if(inicio.getTime() <= duracion) {
-                    System.out.println("dato guardando..");
-                    db.agregar(message);
-               }
+               if(Inicio <= totalTiempo)
+                     db.agregar(message);
+
                 else
                     System.out.println("dato no guardado");
 
-            System.out.println("Tiempo demorado:\t" + duracion + " nanosegundos.");
+            System.out.println("Tiempo demorado:\t" + totalTiempo + " nanosegundos.");
 
 
 
