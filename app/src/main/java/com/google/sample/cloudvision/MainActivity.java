@@ -38,7 +38,6 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
-import com.google.sample.cloudvision.BD.registro;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -393,7 +392,7 @@ public class MainActivity extends AppCompatActivity {
             for (EntityAnnotation landmark : landmarks) {
                 message += String.format("%.3f: %s", landmark.getScore(), landmark.getDescription());
                 message += "\n";
-                registro reg = new registro(message);
+                //registro reg = new registro(message);
                 //db.agregar(message);
             }
         } else {
