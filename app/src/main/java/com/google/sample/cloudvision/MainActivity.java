@@ -131,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
         if (Environment.getExternalStorageState() != null) {
             File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
             if (dir.exists()) {
-                //dir.delete();
             } else {
                 dir.mkdir();
             }
@@ -147,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
 
             fileCopy(new File(fromPath), new File(toPath));
 
-            //This is to refresh the folders in Windows USB conn.
+
             MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
             MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
         }
@@ -350,6 +349,7 @@ public class MainActivity extends AppCompatActivity {
                 message += String.format("%.3f: %s", label.getScore(), label.getDescription());
                 message += "\n";
 
+                db.agregar(message);
 
             }
         } else {
@@ -362,8 +362,7 @@ public class MainActivity extends AppCompatActivity {
             for (EntityAnnotation text : texts) {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
-                db.agregar(message);
-
+                //db.agregar(message);
 
 
             }

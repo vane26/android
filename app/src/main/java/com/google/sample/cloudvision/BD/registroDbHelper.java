@@ -5,17 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
 import android.util.Log;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,14 +92,15 @@ public class registroDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         if (db != null) {
             ContentValues values = new ContentValues();
-            registro registro = new registro(texto);
-            values.put("TEXTO ", registro.getTexto());
+            //registro registro = new registro(texto);
+            values.put("TEXTO ", texto);
             id = (int) db.insert(registroContract.registroEntry.table_name, null, values);
         }
         db.close();
         return id;
 
     }
+
 
 
     public int update(registro registro) {
