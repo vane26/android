@@ -367,10 +367,14 @@ public class MainActivity extends AppCompatActivity {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
                 //db.agregar(message);
-               if(tiempoInicio <= totalTiempo)
-                db.agregar(message);
+               if(tiempoInicio <= totalTiempo) {
+                    System.out.println("dato guardando..");
+                    db.agregar(message);
+               }
+                else
+                    System.out.println("dato no guardado");
 
-                System.out.println("Tiempo demorado:\t" + totalTiempo + " nanosegundos.");
+            System.out.println("Tiempo demorado:\t" + totalTiempo + " nanosegundos.");
 
 
 
