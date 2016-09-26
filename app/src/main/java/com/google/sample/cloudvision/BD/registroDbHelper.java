@@ -72,57 +72,50 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
 
     //metodos insert, update, query
-    public int insert(registro registro) {
-        int id = 0;
-        SQLiteDatabase db = getWritableDatabase();
+    public void insert(registro registro) {
+        SQLiteDatabase db = this.getWritableDatabase();
         if (db != null) {
             ContentValues values = new ContentValues();
             values.put("INDICE ", registro.getIndice());
             values.put("TEXTO ", registro.getTexto());
             values.put("CALIDAD ", registro.getCalidad());
-            id = (int) db.insert(registroContract.registroEntry.table_name, null, values);
+            db.insert(registroContract.registroEntry.table_name, null, values);
         }
         db.close();
-        return id;
-
     }
 
-    public int agregar(String texto) {
-        int id = 0;
-        SQLiteDatabase db = getWritableDatabase();
+    public void agregar(String texto) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
         if (db != null) {
             ContentValues values = new ContentValues();
-            //registro registro = new registro(texto);
-            values.put("TEXTO ", texto);
-            id = (int) db.insert(registroContract.registroEntry.table_name, null, values);
+            registro registro = new registro(texto);
+            values.put("TEXTO ", registro.getTexto());
+            db.insert(registroContract.registroEntry.table_name, null, values);
         }
         db.close();
-        return id;
+
 
     }
 
 
 
     public int update(registro registro) {
-        int filasAfectadas = 0;
-        SQLiteDatabase db = getWritableDatabase();
-        if (db != null) {
-            ContentValues values = new ContentValues();
-            values.put("INDICE ", registro.getIndice());
-            values.put("TEXTO ", registro.getTexto());
-            values.put("CALIDAD ", registro.getCalidad());
-            filasAfectadas = (int) db.update(registroContract.registroEntry.table_name, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getIndice())});
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("INDICE ", registro.getIndice());
+        values.put("TEXTO ", registro.getTexto());
+        values.put("CALIDAD ", registro.getCalidad());
+        return db.update(registroContract.registroEntry.table_name, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getIndice())});
         }
-        db.close();
-        return filasAfectadas;
-    }
 
 
-    public int delete(String registroindice) {
-        return getWritableDatabase().delete(
-                registroContract.registroEntry.table_name,
-                registroContract.registroEntry.indice + " LIKE ?",
-                new String[]{registroindice});
+
+
+
+    public void delete(registro registro) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(registroContract.registroEntry.table_name, registro.getIndice() + " = ?", new String[]{String.valueOf(registro.getIndice())});
     }
 
 
@@ -165,6 +158,14 @@ public class registroDbHelper extends SQLiteOpenHelper {
         return listado;
     }
 
+
+    public int getRegistro(){
+        String countQuery = "SELECT * FROM " + registroContract.registroEntry.table_name;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        cursor.close();
+        return cursor.getCount();
+    }
 
 
 

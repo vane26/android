@@ -350,6 +350,7 @@ public class MainActivity extends AppCompatActivity {
                 message += "\n";
 
                 db.agregar(message);
+                db.getRegistro();
 
             }
         } else {
