@@ -128,6 +128,10 @@ public class MainActivity extends AppCompatActivity {
 
 }
 
+
+
+
+
     public void backupDatabase(View view) throws IOException {
         if (Environment.getExternalStorageState() != null) {
             File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
@@ -341,8 +345,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
-        String message = "I found these things:\n\n";
-
         long totalTiempo;
         long Inicio;
         long Termino;
@@ -353,12 +355,7 @@ public class MainActivity extends AppCompatActivity {
         Calendar ahora2 = Calendar.getInstance();
         Termino = ahora2.getTimeInMillis();
 
-        totalTiempo = Termino - Inicio;
-
-       // Date inicio = new Date();
-       // Date termino = new Date();
-
-        //long duracion = termino.getTime() - inicio.getTime();
+        String message = "I found these things:\n\n";
 
         List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
         if (labels != null) {
@@ -379,15 +376,17 @@ public class MainActivity extends AppCompatActivity {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
                 //db.agregar(message);
-               if(Inicio <= totalTiempo)
-                   db.agregar(message);
 
-                else
-                    System.out.println("dato no guardado");
 
+            if(Inicio <= Termino)
+                db.agregar(message);
+
+
+            totalTiempo = Termino - Inicio;
+
+
+                //long duracion = termino.getTime() - inicio.getTime();
             System.out.println("Tiempo demorado:\t" + totalTiempo + " nanosegundos.");
-
-
 
 
             }
@@ -414,6 +413,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
 
 
 
