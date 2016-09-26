@@ -380,7 +380,7 @@ public class MainActivity extends AppCompatActivity {
                 message += "\n";
                 //db.agregar(message);
                if(Inicio <= totalTiempo)
-                     db.agregar(message);
+                   db.agregar(message);
 
                 else
                     System.out.println("dato no guardado");
