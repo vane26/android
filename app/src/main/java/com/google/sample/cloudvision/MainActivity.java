@@ -341,6 +341,11 @@ public class MainActivity extends AppCompatActivity {
 
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
         String message = "I found these things:\n\n";
+        long totalTiempo;
+        long tiempoInicio;
+        tiempoInicio = System.nanoTime();
+        totalTiempo = System.nanoTime() - tiempoInicio;
+
 
 
         List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
@@ -349,8 +354,6 @@ public class MainActivity extends AppCompatActivity {
                 message += String.format("%.3f: %s", label.getScore(), label.getDescription());
                 message += "\n";
 
-                db.agregar(message);
-                db.getRegistro();
 
             }
         } else {
@@ -364,6 +367,12 @@ public class MainActivity extends AppCompatActivity {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
                 //db.agregar(message);
+               if(tiempoInicio <= totalTiempo)
+                db.agregar(message);
+
+                System.out.println("Tiempo demorado:\t" + totalTiempo + " nanosegundos.");
+
+
 
 
             }
