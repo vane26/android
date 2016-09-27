@@ -7,7 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -21,6 +23,13 @@ public class registroDbHelper extends SQLiteOpenHelper {
     public static String db_path = "/data/data/com.google.sample.cloudvision.BD/databases/";
     public static String data_base = "registro_db.csv";
 
+
+
+    private String INICIO_PROCESO = "Comienza el proceso";
+    private String FIN_PROCESO = "Finaliza el proceso tardo: %s:%s:%s";
+    private String FORMATO_DOS_DIGITOS = "00";
+
+    public Date fechaInicio;
 
     // SQLiteDatabase db;
     registroDbHelper db;
@@ -168,6 +177,26 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
+
+    public void comenzarProceso() {
+        System.out.println(INICIO_PROCESO);
+        this.fechaInicio = new Date();
+    }
+
+
+
+    public void finalizaProceso(){
+
+        Date fechaFin = new Date();
+        Long tiempoTranscurrido = fechaFin.getTime() - fechaInicio.getTime();
+
+        Long diffSeconds = tiempoTranscurrido / 1000 % 60;
+        Long diffMinutes = tiempoTranscurrido / (60 * 1000) % 60;
+        Long diffHours = tiempoTranscurrido / (60 * 60 * 1000) % 24;
+
+        DecimalFormat df = new DecimalFormat(FORMATO_DOS_DIGITOS);
+        System.out.println(String.format(FIN_PROCESO, df.format(diffHours), df.format(diffMinutes), df.format(diffSeconds)));
+    }
 
 }
 

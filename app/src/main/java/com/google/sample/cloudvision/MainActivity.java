@@ -47,9 +47,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -64,11 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView mMainImage;
     public Context myContext;
 
-    private String INICIO_PROCESO = "Comienza el proceso";
-    private String FIN_PROCESO = "Finaliza el proceso tardo: %s:%s:%s";
-    private String FORMATO_DOS_DIGITOS = "00";
 
-    public Date fechaInicio;
 
 
     @Override
@@ -97,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startGalleryChooser();
-                                comenzarProceso();
+                                db.comenzarProceso();
                                 try {
                                     backupDatabase(fab);
                                 } catch (IOException e) {
@@ -109,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
-                                comenzarProceso();
+                                db.comenzarProceso();
                                 try {
                                     backupDatabase(fab);
                                 } catch (IOException e) {
@@ -133,27 +127,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void comenzarProceso() {
-        System.out.println(INICIO_PROCESO);
-        this.fechaInicio = new Date();
-    }
 
 
-    /*
-    public void finalizaProceso(){
 
-        Date fechaFin = new Date();
-        Long tiempoTranscurrido = fechaFin.getTime() - fechaInicio.getTime();
-
-        Long diffSeconds = tiempoTranscurrido / 1000 % 60;
-        Long diffMinutes = tiempoTranscurrido / (60 * 1000) % 60;
-        Long diffHours = tiempoTranscurrido / (60 * 60 * 1000) % 24;
-
-        DecimalFormat df = new DecimalFormat(FORMATO_DOS_DIGITOS);
-        System.out.println(String.format(FIN_PROCESO, df.format(diffHours), df.format(diffMinutes), df.format(diffSeconds)));
-    }
-
-    */
 
     public void backupDatabase(View view) throws IOException {
         if (Environment.getExternalStorageState() != null) {
@@ -369,15 +345,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
-        Date fechaFin = new Date();
-        Long tiempoTranscurrido = fechaFin.getTime() - fechaInicio.getTime();
 
-        Long diffSeconds = tiempoTranscurrido / 1000 % 60;
-        Long diffMinutes = tiempoTranscurrido / (60 * 1000) % 60;
-        Long diffHours = tiempoTranscurrido / (60 * 60 * 1000) % 24;
-
-        DecimalFormat df = new DecimalFormat(FORMATO_DOS_DIGITOS);
-        System.out.println(String.format(FIN_PROCESO, df.format(diffHours), df.format(diffMinutes), df.format(diffSeconds)));
 
 
         String message = "I found these things:\n\n";
@@ -402,9 +370,8 @@ public class MainActivity extends AppCompatActivity {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
                 //db.agregar(message);
-
-                if (fechaInicio.getTime() <= tiempoTranscurrido)
-                    db.agregar(message);
+                db.finalizaProceso();
+                db.agregar(message);
 
 
             }
