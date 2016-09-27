@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /*
     public void finalizaProceso(){
 
         Date fechaFin = new Date();
@@ -155,6 +156,8 @@ public class MainActivity extends AppCompatActivity {
         DecimalFormat df = new DecimalFormat(FORMATO_DOS_DIGITOS);
         System.out.println(String.format(FIN_PROCESO, df.format(diffHours), df.format(diffMinutes), df.format(diffSeconds)));
     }
+
+    */
 
     public void backupDatabase(View view) throws IOException {
         if (Environment.getExternalStorageState() != null) {
@@ -371,6 +374,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
+        Date fechaFin = new Date();
+        Long tiempoTranscurrido = fechaFin.getTime() - fechaInicio.getTime();
+
+        Long diffSeconds = tiempoTranscurrido / 1000 % 60;
+        Long diffMinutes = tiempoTranscurrido / (60 * 1000) % 60;
+        Long diffHours = tiempoTranscurrido / (60 * 60 * 1000) % 24;
+
+        DecimalFormat df = new DecimalFormat(FORMATO_DOS_DIGITOS);
+        System.out.println(String.format(FIN_PROCESO, df.format(diffHours), df.format(diffMinutes), df.format(diffSeconds)));
 
 
 
@@ -400,13 +412,9 @@ public class MainActivity extends AppCompatActivity {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
                 //db.agregar(message);
-                try{
-                    finalizaProceso();
+                if(fechaInicio.getTime() <= tiempoTranscurrido) {
                     db.agregar(message);
-                }catch (Exception e){
-                    System.out.println("dato no agregado");
                 }
-
 
 
             }
