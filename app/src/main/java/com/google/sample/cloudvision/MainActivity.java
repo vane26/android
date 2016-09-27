@@ -47,8 +47,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -63,6 +64,13 @@ public class MainActivity extends AppCompatActivity {
     private ImageView mMainImage;
     public Context myContext;
 
+    private String INICIO_PROCESO = "Comienza el proceso";
+    private String FIN_PROCESO = "Finaliza el proceso tardo: %s:%s:%s";
+    private String FORMATO_DOS_DIGITOS = "00";
+
+    private Date fechaInicio;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
         //db.getWritableDatabase(); //accion a realizar, lectura o escritura.
-
+        comenzarProceso();
 
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -127,9 +135,23 @@ public class MainActivity extends AppCompatActivity {
 
 }
 
+    public void comenzarProceso(){
+        System.out.println(INICIO_PROCESO);
+        this.fechaInicio = new Date();
+    }
 
 
+    public void finalizaProceso(){
+        Date fechaFin = new Date();
+        Long tiempoTranscurrido = fechaFin.getTime() - fechaInicio.getTime();
 
+        Long diffSeconds = tiempoTranscurrido / 1000 % 60;
+        Long diffMinutes = tiempoTranscurrido / (60 * 1000) % 60;
+        Long diffHours = tiempoTranscurrido / (60 * 60 * 1000) % 24;
+
+        DecimalFormat df = new DecimalFormat(FORMATO_DOS_DIGITOS);
+        System.out.println(String.format(FIN_PROCESO, df.format(diffHours), df.format(diffMinutes), df.format(diffSeconds)));
+    }
 
     public void backupDatabase(View view) throws IOException {
         if (Environment.getExternalStorageState() != null) {
@@ -344,26 +366,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
-        long totalTiempo;
-        long Inicio;
-        long Termino;
 
-        Calendar ahora1 = Calendar.getInstance();
-        Inicio = ahora1.getTimeInMillis();
-
-        Calendar ahora2 = Calendar.getInstance();
-        Termino = ahora2.getTimeInMillis();
 
         String message = "I found these things:\n\n";
+
+
 
         List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
         if (labels != null) {
             for (EntityAnnotation label : labels) {
                 message += String.format("%.3f: %s", label.getScore(), label.getDescription());
                 message += "\n";
+                finalizaProceso();
+                db.agregar(message);
 
 
-            }
+                 }
         } else {
             message += "nothing";
         }
@@ -399,15 +417,7 @@ public class MainActivity extends AppCompatActivity {
             message += "nothing";
         }
 
-        if(Inicio <= Termino)
-            db.agregar(message);
 
-
-        totalTiempo = Termino - Inicio;
-
-
-        //long duracion = termino.getTime() - inicio.getTime();
-        System.out.println("Tiempo demorado:\t" + totalTiempo + " nanosegundos.");
 
 
 
@@ -417,9 +427,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-
+/*
+    public long medirtiempo(){
+        long tiempoInicio = System.currentTimeMillis();
+        long totalTiempo = System.currentTimeMillis() - tiempoInicio;
+        System.out.println("El tiempo total de la ejecución es :" + totalTiempo + " miliseg");
+        return totalTiempo;
+    }
+*/
 
 
 
