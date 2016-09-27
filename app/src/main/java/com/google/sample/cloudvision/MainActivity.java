@@ -68,8 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private String FIN_PROCESO = "Finaliza el proceso tardo: %s:%s:%s";
     private String FORMATO_DOS_DIGITOS = "00";
 
-    private Date fechaInicio;
-
+    public Date fechaInicio;
 
 
     @Override
@@ -78,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
 
         db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
@@ -90,16 +88,16 @@ public class MainActivity extends AppCompatActivity {
 
         fab.setOnClickListener(new View.OnClickListener() {
 
-         @Override
-          public void onClick(View view) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder
                         .setMessage(R.string.dialog_select_prompt)
                         .setPositiveButton(R.string.dialog_select_gallery, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startGalleryChooser();
-                                comenzarProceso(fab);
+                                comenzarProceso();
                                 try {
                                     backupDatabase(fab);
                                 } catch (IOException e) {
@@ -111,14 +109,13 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
-                                comenzarProceso(fab);
+                                comenzarProceso();
                                 try {
                                     backupDatabase(fab);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
                             }
-
 
 
                         });
@@ -130,14 +127,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
         mImageDetails = (TextView) findViewById(R.id.image_details);
         mMainImage = (ImageView) findViewById(R.id.main_image);
 
 
-}
+    }
 
-    public void comenzarProceso(View view){
+    public void comenzarProceso() {
         System.out.println(INICIO_PROCESO);
         this.fechaInicio = new Date();
     }
@@ -216,7 +212,6 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
         }
     }
-
 
 
     public File getCameraFile() {
@@ -385,9 +380,7 @@ public class MainActivity extends AppCompatActivity {
         System.out.println(String.format(FIN_PROCESO, df.format(diffHours), df.format(diffMinutes), df.format(diffSeconds)));
 
 
-
         String message = "I found these things:\n\n";
-
 
 
         List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
@@ -397,10 +390,7 @@ public class MainActivity extends AppCompatActivity {
                 message += "\n";
 
 
-
-
-
-                 }
+            }
         } else {
             message += "nothing";
         }
@@ -412,39 +402,35 @@ public class MainActivity extends AppCompatActivity {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
                 //db.agregar(message);
-                if(fechaInicio.getTime() <= tiempoTranscurrido) {
+
+                if (fechaInicio.getTime() <= tiempoTranscurrido)
                     db.agregar(message);
+
+
+            }
+        } else {
+                message += "nothing";
+
+            }
+
+
+            List<EntityAnnotation> landmarks = response.getResponses().get(0).getLandmarkAnnotations();
+            if (landmarks != null) {
+                for (EntityAnnotation landmark : landmarks) {
+                    message += String.format("%.3f: %s", landmark.getScore(), landmark.getDescription());
+                    message += "\n";
+                    //registro reg = new registro(message);
+                    //db.agregar(message);
                 }
-
-
+            } else {
+                message += "nothing";
             }
 
-        } else {
-            message += "nothing";
+
+            return message;
+
 
         }
-
-
-        List<EntityAnnotation> landmarks = response.getResponses().get(0).getLandmarkAnnotations();
-        if (landmarks != null) {
-            for (EntityAnnotation landmark : landmarks) {
-                message += String.format("%.3f: %s", landmark.getScore(), landmark.getDescription());
-                message += "\n";
-                //registro reg = new registro(message);
-                //db.agregar(message);
-            }
-        } else {
-            message += "nothing";
-        }
-
-
-
-
-
-        return message;
-
-
-    }
 
 
 /*
@@ -457,10 +443,8 @@ public class MainActivity extends AppCompatActivity {
 */
 
 
+    }
 
-
-
-}
 
 
 
