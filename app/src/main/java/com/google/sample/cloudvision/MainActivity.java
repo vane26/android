@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
         //db.getWritableDatabase(); //accion a realizar, lectura o escritura.
-        comenzarProceso();
+
 
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startGalleryChooser();
+                                comenzarProceso(fab);
                                 try {
                                     backupDatabase(fab);
                                 } catch (IOException e) {
@@ -110,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
+                                comenzarProceso(fab);
                                 try {
                                     backupDatabase(fab);
                                 } catch (IOException e) {
@@ -135,13 +137,14 @@ public class MainActivity extends AppCompatActivity {
 
 }
 
-    public void comenzarProceso(){
+    public void comenzarProceso(View view){
         System.out.println(INICIO_PROCESO);
         this.fechaInicio = new Date();
     }
 
 
     public void finalizaProceso(){
+
         Date fechaFin = new Date();
         Long tiempoTranscurrido = fechaFin.getTime() - fechaInicio.getTime();
 
@@ -264,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void callCloudVision(final Bitmap bitmap) throws IOException {
+
         // Switch text to loading
         mImageDetails.setText(R.string.loading_message);
         // Do the real work in an async task, because we need to use the network anyway
@@ -271,6 +275,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected String doInBackground(Object... params) {
                 try {
+
                     HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
                     JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 
@@ -368,6 +373,7 @@ public class MainActivity extends AppCompatActivity {
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
 
 
+
         String message = "I found these things:\n\n";
 
 
@@ -377,8 +383,9 @@ public class MainActivity extends AppCompatActivity {
             for (EntityAnnotation label : labels) {
                 message += String.format("%.3f: %s", label.getScore(), label.getDescription());
                 message += "\n";
-                finalizaProceso();
-                db.agregar(message);
+
+
+
 
 
                  }
@@ -393,7 +400,12 @@ public class MainActivity extends AppCompatActivity {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
                 //db.agregar(message);
-
+                try{
+                    finalizaProceso();
+                    db.agregar(message);
+                }catch (Exception e){
+                    System.out.println("dato no agregado");
+                }
 
 
 
