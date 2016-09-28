@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -42,9 +41,9 @@ import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -128,7 +127,34 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    public void backupDatabase(View view) throws IOException {
+        final String inFileName = "/data/data/com.google.sample.cloudvision.BD/databases/registro_db.csv";
+        File dbFile = new File(inFileName);
+        FileInputStream fis = new FileInputStream(dbFile);
 
+        String outFileName = Environment.getExternalStorageDirectory()+"/registro_db.csv";
+
+        // Open the empty db as the output stream
+        OutputStream output = new FileOutputStream(outFileName);
+
+        // Transfer bytes from the inputfile to the outputfile
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = fis.read(buffer))>0){
+            output.write(buffer, 0, length);
+        }
+
+        // Close the streams
+        output.flush();
+        output.close();
+        fis.close();
+
+
+
+
+
+    }
+   /*
     public void backupDatabase(View view) throws IOException {
        if (Environment.getExternalStorageState() != null) {
             File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
@@ -144,31 +170,17 @@ public class MainActivity extends AppCompatActivity {
                 fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
             }
 
-           String toPath = dir.getAbsolutePath() + "/registro_db.csv";
-           OutputStream databaseOut = new FileOutputStream(fromPath);
-           InputStream databaseIn;
-
-           byte[]buffer = new byte[1024];
-           int largo;
-
-           databaseIn = myContext.getAssets().open(fromPath);
-           while ((largo = databaseIn.read(buffer)) > 0) {
-               databaseOut.write(buffer);
-           }
+            String toPath = dir.getAbsolutePath() + "/registro_db.csv";
 
 
-           //CopiarArchivo.getInstance().copiar(fromPath, toPath);
+           CopiarArchivo.getInstance().copiar(fromPath, toPath);
 
 
-          MediaScannerConnection.scanFile(this, new String[]{ Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
-          MediaScannerConnection.scanFile(this, new String[]{toPath + String.valueOf(databaseIn)}, null, null);
-
-          databaseIn.close();
-          databaseOut.flush();
-          databaseOut.close();
+           MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
+            MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
         }
     }
-
+*/
    /*
     public void fileCopy(File src, File dst) throws IOException {
         InputStream in = new FileInputStream(src);
