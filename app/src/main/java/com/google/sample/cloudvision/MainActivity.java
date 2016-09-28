@@ -42,7 +42,10 @@ import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,14 +144,26 @@ public class MainActivity extends AppCompatActivity {
                 fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
             }
 
-            String toPath = dir.getAbsolutePath() + "/registro_db.csv";
+           String toPath = dir.getAbsolutePath() + "/registro_db.csv";
+           OutputStream databaseOut = new FileOutputStream(fromPath);
+           InputStream databaseIn;
+
+           byte[]buffer = new byte[1024];
+           int largo;
+
+           databaseIn = myContext.getAssets().open(fromPath);
+           while ((largo = databaseIn.read(buffer)) > 0) {
+               databaseOut.write(buffer);
+           }
+           databaseIn.close();
+           databaseOut.flush();
+           databaseOut.close();
+
+           //CopiarArchivo.getInstance().copiar(fromPath, toPath);
 
 
-           CopiarArchivo.getInstance().copiar(fromPath, toPath);
-
-
-           MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
-            MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
+          MediaScannerConnection.scanFile(this, new String[]{ Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
+          MediaScannerConnection.scanFile(this, new String[]{toPath + String.valueOf(databaseIn)}, null, null);
         }
     }
 
