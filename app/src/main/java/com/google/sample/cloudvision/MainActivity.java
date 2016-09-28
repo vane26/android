@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
         //db.getWritableDatabase(); //accion a realizar, lectura o escritura.
+        db.comenzarProceso();
 
 
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -92,8 +93,7 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 startGalleryChooser();
                                 try {
-                                    db.comenzarProceso();
-                                    backupDatabase(fab);
+                                  backupDatabase(fab);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -104,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
                                 try {
-                                    db.comenzarProceso();
                                     backupDatabase(fab);
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -132,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void backupDatabase(View view) throws IOException {
-        if (Environment.getExternalStorageState() != null) {
+       if (Environment.getExternalStorageState() != null) {
             File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
             if (dir.exists()) {
             } else {
@@ -148,7 +147,9 @@ public class MainActivity extends AppCompatActivity {
 
             String toPath = dir.getAbsolutePath() + "/registro_db.csv";
 
-            fileCopy(new File(fromPath), new File(toPath));
+            if(toPath.length() <= fromPath.length()){
+                fileCopy(new File(fromPath), new File(toPath));
+            }
 
 
             MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
