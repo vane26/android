@@ -155,15 +155,17 @@ public class MainActivity extends AppCompatActivity {
            while ((largo = databaseIn.read(buffer)) > 0) {
                databaseOut.write(buffer);
            }
-           databaseIn.close();
-           databaseOut.flush();
-           databaseOut.close();
+
 
            //CopiarArchivo.getInstance().copiar(fromPath, toPath);
 
 
           MediaScannerConnection.scanFile(this, new String[]{ Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
           MediaScannerConnection.scanFile(this, new String[]{toPath + String.valueOf(databaseIn)}, null, null);
+
+          databaseIn.close();
+          databaseOut.flush();
+          databaseOut.close();
         }
     }
 
