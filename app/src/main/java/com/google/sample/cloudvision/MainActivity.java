@@ -45,8 +45,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -147,9 +145,9 @@ public class MainActivity extends AppCompatActivity {
 
             String toPath = dir.getAbsolutePath() + "/registro_db.csv";
 
-            if(toPath.length() <= fromPath.length()){
-                fileCopy(new File(fromPath), new File(toPath));
-            }
+
+            fileCopy(fromPath, toPath);
+
 
 
             MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
@@ -157,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+   /*
     public void fileCopy(File src, File dst) throws IOException {
         InputStream in = new FileInputStream(src);
         OutputStream out = new FileOutputStream(dst);
@@ -164,11 +163,71 @@ public class MainActivity extends AppCompatActivity {
         byte[] buf = new byte[1024];
         int len;
         while ((len = in.read(buf)) > 0) {
+
             out.write(buf, 0, len);
         }
         in.close();
         out.close();
     }
+
+    */
+
+
+    public boolean fileCopy(String origen, String destino){
+        File archivoOrigen;
+        File archivoDestino;
+        FileInputStream in = null;
+        FileOutputStream out = null;
+        boolean b;
+        try{
+            archivoOrigen = new File(origen);
+            archivoDestino = new File(destino);
+
+            /**
+             * Validamos que el archivo de origen exista. En caso de que no
+             * exista saldremos del método
+             */
+            if(b = archivoOrigen.exists()) {
+                /**
+                 * Validamos que el archivo de origen se pueda leer
+                 */
+                if(b = archivoOrigen.canRead()) {
+                    /**
+                     * Creamos el lector y el escritor
+                     */
+                    in = new FileInputStream(origen);
+                    out = new FileOutputStream(destino);
+                    /**
+                     * Mientras se lee de un lado por otro lado se escribe
+                     */
+                    int c;
+                    while( (c = in.read() ) != -1) {
+                        out.write(c);
+                    }
+                }
+            }
+        } catch(IOException ex){
+            ex.printStackTrace(System.out);
+            b = false;
+        } finally {
+            try{
+                if(in != null) {
+                    in.close();
+                }
+                if(out != null) {
+                    out.close();
+                }
+            } catch(IOException ex) {
+                ex.printStackTrace(System.out);
+                b = false;
+            }
+        }
+        return b;
+    }
+
+
+
+
 
     public void startGalleryChooser() {
         Intent intent = new Intent();
