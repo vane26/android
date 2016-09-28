@@ -91,8 +91,8 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startGalleryChooser();
-                                db.comenzarProceso();
                                 try {
+                                    db.comenzarProceso();
                                     backupDatabase(fab);
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -103,8 +103,8 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
-                                db.comenzarProceso();
                                 try {
+                                    db.comenzarProceso();
                                     backupDatabase(fab);
                                 } catch (IOException e) {
                                     e.printStackTrace();

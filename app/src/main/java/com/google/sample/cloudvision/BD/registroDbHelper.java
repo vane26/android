@@ -118,6 +118,13 @@ public class registroDbHelper extends SQLiteOpenHelper {
         return db.update(registroContract.registroEntry.table_name, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getIndice())});
         }
 
+    public int update(String texto) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        registro registro = new registro(texto);
+        values.put("TEXTO ", registro.getTexto());
+        return db.update(registroContract.registroEntry.table_name, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getTexto())});
+    }
 
 
 
