@@ -40,10 +40,12 @@ import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -144,14 +146,14 @@ public class MainActivity extends AppCompatActivity {
                 fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
             }
 
-           // String toPath = dir.getAbsolutePath() + "/registro_db.csv";
-            //File tempFile = File.createTempFile(toPath,null);
-            //BufferedWriter out = new BufferedWriter(new FileWriter(tempFile));
-            //out.write(toPath);
-           // tempFile.deleteOnExit();
-           // out.close();
+            String temp = dir.getAbsolutePath() + "/registro_db.temp";
+            File tempFile = File.createTempFile(temp,null);
+            BufferedWriter out = new BufferedWriter(new FileWriter(tempFile));
+            out.write(temp);
+            tempFile.deleteOnExit();
+            out.close();
 
-            String toPath = dir.getAbsolutePath() + "/registro_db.csv";
+           String toPath = dir + fromPath;
 
 
           // CopiarArchivo.getInstance();
