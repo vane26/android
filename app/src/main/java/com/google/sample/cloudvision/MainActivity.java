@@ -153,7 +153,11 @@ public class MainActivity extends AppCompatActivity {
             tempFile.deleteOnExit();
             out.close();
 
-           String toPath = dir + fromPath;
+           String toPath = dir.getAbsolutePath() + "/registro_db.csv";
+           BufferedWriter out2 = new BufferedWriter(new FileWriter(toPath));
+           out2.write(toPath);
+           out2.close();
+
 
 
           // CopiarArchivo.getInstance();
