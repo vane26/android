@@ -45,9 +45,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -92,15 +90,22 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startGalleryChooser();
-                                backupdDatabase();
-
+                                try {
+                                  backupDatabase(fab);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         })
                         .setNegativeButton(R.string.dialog_select_camera, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
-                                backupdDatabase();
+                                try {
+                                    backupDatabase(fab);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
 
 
@@ -121,63 +126,28 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-/*
+
     public void backupDatabase(View view) throws IOException {
-       if (Environment.getExternalStorageState() != null) {
-            File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
-            if (dir.exists()) {
-            } else {
-                dir.mkdir();
-            }
-
-            String fromPath = "";
-            if (android.os.Build.VERSION.SDK_INT >= 4.2) {
-                fromPath = getApplicationInfo().dataDir + "/databases/" + "registro_db.csv";
-            } else {
-                fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
-            }
-
-            String toPath = dir.getAbsolutePath() + "/registro_db.csv";
-            File tempFile = File.createTempFile(toPath ,null);
-            BufferedWriter out = new BufferedWriter(new FileWriter(tempFile));
-            out.write(toPath);
-            tempFile.deleteOnExit();
-            out.close();
-
-           toPath = dir.getAbsolutePath() + "/registro_db.csv";
-
-
-           //CopiarArchivo.getInstance();
-           //CopiarArchivo.copiar(fromPath, toPath);
-
-           FileCopy(fromPath, toPath);
-
-           MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
-           MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
-        }
-    }
-*/
-
-
-
-    public void backupdDatabase(){
         try {
-            File sd = Environment.getExternalStorageDirectory();
-            File data = Environment.getDataDirectory();
-            String packageName  = "com.google.sample.cloudvision.BD";
-            String sourceDBName = "registro_db.csv";
-            String targetDBName = "registro_db";
-            if (sd.canWrite()) {
-                Date now = new Date();
-                String currentDBPath = "data/" + packageName + "/databases/" + sourceDBName;
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
-                String backupDBPath = targetDBName + dateFormat.format(now) + ".csv";
+            if (Environment.getExternalStorageState() != null) {
+                File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
+                if (dir.exists()) {
+                } else {
+                    dir.mkdir();
+                }
 
-                File currentDB = new File(data, currentDBPath);
-                File backupDB = new File(sd, backupDBPath);
+                String fromPath = "";
+                if (android.os.Build.VERSION.SDK_INT >= 4.2) {
+                    fromPath = getApplicationInfo().dataDir + "/databases/" + "registro_db.csv";
+                } else {
+                    fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
+                }
 
-                Log.i("backup","backupDB=" + backupDB.getAbsolutePath());
-                Log.i("backup","sourceDB=" + currentDB.getAbsolutePath());
+                File currentDB = new File(fromPath);
+                File backupDB = new File(dir, "registro_db.csv");
+
+                Log.i("backup", "backupDB=" + backupDB.getAbsolutePath());
+                Log.i("backup", "sourceDB=" + currentDB.getAbsolutePath());
 
                 FileChannel src = new FileInputStream(currentDB).getChannel();
                 FileChannel dst = new FileOutputStream(backupDB).getChannel();
@@ -185,10 +155,12 @@ public class MainActivity extends AppCompatActivity {
                 src.close();
                 dst.close();
             }
-        } catch (Exception e) {
+        }catch (Exception e) {
             Log.i("Backup", e.toString());
         }
     }
+
+    
 
     /*
     public void FileCopy(String sourceFile, String destinationFile) {
