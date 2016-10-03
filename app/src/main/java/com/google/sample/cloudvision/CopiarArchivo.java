@@ -40,7 +40,7 @@ public class CopiarArchivo {
      * @param destino
      * @return boolean
      */
-    public boolean copiar(String origen, String destino){
+    public static boolean copiar(String origen, String destino){
         File archivoOrigen;
         File archivoDestino;
         FileInputStream in = null;

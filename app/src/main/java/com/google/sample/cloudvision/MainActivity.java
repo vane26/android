@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -44,7 +45,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -128,34 +128,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void backupDatabase(View view) throws IOException {
-        final String inFileName = "/data/data/com.google.sample.cloudvision.BD/databases/registro_db.csv";
-        File dbFile = new File(inFileName);
-        FileInputStream fis = new FileInputStream(dbFile);
-
-        String outFileName = Environment.getExternalStorageDirectory()+"/registro_db.csv";
-
-        // Open the empty db as the output stream
-        OutputStream output = new FileOutputStream(outFileName);
-
-        // Transfer bytes from the inputfile to the outputfile
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = fis.read(buffer))>0){
-            output.write(buffer, 0, length);
-        }
-
-        // Close the streams
-        output.flush();
-        output.close();
-        fis.close();
-
-
-
-
-
-    }
-   /*
-    public void backupDatabase(View view) throws IOException {
        if (Environment.getExternalStorageState() != null) {
             File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
             if (dir.exists()) {
@@ -170,33 +142,49 @@ public class MainActivity extends AppCompatActivity {
                 fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
             }
 
+           // String toPath = dir.getAbsolutePath() + "/registro_db.csv";
+            //File tempFile = File.createTempFile(toPath,null);
+            //BufferedWriter out = new BufferedWriter(new FileWriter(tempFile));
+            //out.write(toPath);
+           // tempFile.deleteOnExit();
+           // out.close();
+
             String toPath = dir.getAbsolutePath() + "/registro_db.csv";
 
 
-           CopiarArchivo.getInstance().copiar(fromPath, toPath);
+          // CopiarArchivo.getInstance();
+           //CopiarArchivo.copiar(fromPath, toPath);
 
+            FileCopy(fromPath, toPath);
 
            MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
-            MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
+           MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
         }
     }
-*/
-   /*
-    public void fileCopy(File src, File dst) throws IOException {
-        InputStream in = new FileInputStream(src);
-        OutputStream out = new FileOutputStream(dst);
 
-        byte[] buf = new byte[1024];
-        int len;
-        while ((len = in.read(buf)) > 0) {
 
-            out.write(buf, 0, len);
+
+        public void FileCopy(String sourceFile, String destinationFile) {
+            System.out.println("Desde: " + sourceFile);
+            System.out.println("Hacia: " + destinationFile);
+
+            try {
+                File inFile = new File(sourceFile);
+                File outFile = new File(destinationFile);
+
+                FileInputStream in = new FileInputStream(inFile);
+                FileOutputStream out = new FileOutputStream(outFile);
+
+                int c;
+                while ((c = in.read()) != -1)
+                    out.write(c);
+
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                System.err.println("Hubo un error de entrada/salida!!!");
+            }
         }
-        in.close();
-        out.close();
-    }
-
-    */
 
 
 
