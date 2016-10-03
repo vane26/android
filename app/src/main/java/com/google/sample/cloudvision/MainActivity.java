@@ -90,22 +90,16 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startGalleryChooser();
-                                try {
-                                  backupDatabase(fab);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                backupDatabase();
+
                             }
                         })
                         .setNegativeButton(R.string.dialog_select_camera, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
-                                try {
-                                    backupDatabase(fab);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                backupDatabase();
+
                             }
 
 
@@ -127,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void backupDatabase(View view) throws IOException {
+    public void backupDatabase(){
         try {
             if (Environment.getExternalStorageState() != null) {
                 File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
@@ -160,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    
+
 
     /*
     public void FileCopy(String sourceFile, String destinationFile) {
