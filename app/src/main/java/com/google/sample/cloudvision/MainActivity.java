@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -40,14 +39,15 @@ import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -92,22 +92,15 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startGalleryChooser();
-                                try {
-                                  backupDatabase(fab);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                backupdDatabase();
+
                             }
                         })
                         .setNegativeButton(R.string.dialog_select_camera, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
-                                try {
-                                    backupDatabase(fab);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                backupdDatabase();
                             }
 
 
@@ -128,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
+/*
     public void backupDatabase(View view) throws IOException {
        if (Environment.getExternalStorageState() != null) {
             File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
@@ -163,8 +156,41 @@ public class MainActivity extends AppCompatActivity {
            MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
         }
     }
+*/
 
 
+
+    public void backupdDatabase(){
+        try {
+            File sd = Environment.getExternalStorageDirectory();
+            File data = Environment.getDataDirectory();
+            String packageName  = "com.google.sample.cloudvision.BD";
+            String sourceDBName = "registro_db.csv";
+            String targetDBName = "registro_db";
+            if (sd.canWrite()) {
+                Date now = new Date();
+                String currentDBPath = "data/" + packageName + "/databases/" + sourceDBName;
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+                String backupDBPath = targetDBName + dateFormat.format(now) + ".csv";
+
+                File currentDB = new File(data, currentDBPath);
+                File backupDB = new File(sd, backupDBPath);
+
+                Log.i("backup","backupDB=" + backupDB.getAbsolutePath());
+                Log.i("backup","sourceDB=" + currentDB.getAbsolutePath());
+
+                FileChannel src = new FileInputStream(currentDB).getChannel();
+                FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                dst.transferFrom(src, 0, src.size());
+                src.close();
+                dst.close();
+            }
+        } catch (Exception e) {
+            Log.i("Backup", e.toString());
+        }
+    }
+
+    /*
     public void FileCopy(String sourceFile, String destinationFile) {
         System.out.println("Desde: " + sourceFile);
         System.out.println("Hacia: " + destinationFile);
@@ -187,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+*/
 
 
 
