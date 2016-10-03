@@ -153,9 +153,9 @@ public class MainActivity extends AppCompatActivity {
 
 
                     File currentDB = new File(fromPath);
-                    File backupDB = new File(dir, "registro_db.csv");
+                    File backupDB = new File(dir.getAbsolutePath(), "registro_db.csv");
 
-                    Log.i("backup", "backupDB=" + backupDB.getAbsolutePath());
+                    Log.i("backup", "backupDB=" + backupDB.getAbsolutePath()+ "/MyApp");
                     Log.i("backup", "sourceDB=" + currentDB.getAbsolutePath());
 
                     FileChannel src = new FileInputStream(currentDB).getChannel();
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    
+
 
     /*
     public void FileCopy(String sourceFile, String destinationFile) {
