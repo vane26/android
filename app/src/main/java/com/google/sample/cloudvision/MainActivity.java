@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -39,10 +40,12 @@ import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -124,30 +127,42 @@ public class MainActivity extends AppCompatActivity {
     public void backupDatabase(){
         try {
             if (Environment.getExternalStorageState() != null) {
-                File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
-                if (dir.exists()) {
-                } else {
-                    dir.mkdir();
-                }
+                    File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
+                    if (dir.exists()) {
+                    } else {
+                        dir.mkdir();
+                    }
 
-                String fromPath = "";
-                if (android.os.Build.VERSION.SDK_INT >= 4.2) {
-                    fromPath = getApplicationInfo().dataDir + "/databases/" + "registro_db.csv";
-                } else {
-                    fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
-                }
+                    String fromPath = "";
+                    if (android.os.Build.VERSION.SDK_INT >= 4.2) {
+                        fromPath = getApplicationInfo().dataDir + "/databases/" + "registro_db.csv";
+                    } else {
+                        fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
+                    }
 
-                File currentDB = new File(fromPath);
-                File backupDB = new File(dir, "registro_db.csv");
+                    String toPath = dir.getAbsolutePath() + "/registro_db.temp";
+                    File tempFile = File.createTempFile(toPath ,null);
+                    BufferedWriter out = new BufferedWriter(new FileWriter(tempFile));
+                    out.write(toPath);
+                    out.write(toPath);
+                    tempFile.deleteOnExit();
+                    out.close();
 
-                Log.i("backup", "backupDB=" + backupDB.getAbsolutePath());
-                Log.i("backup", "sourceDB=" + currentDB.getAbsolutePath());
+                     MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
+                     MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
 
-                FileChannel src = new FileInputStream(currentDB).getChannel();
-                FileChannel dst = new FileOutputStream(backupDB).getChannel();
-                dst.transferFrom(src, 0, src.size());
-                src.close();
-                dst.close();
+
+                    File currentDB = new File(fromPath);
+                    File backupDB = new File(dir, "registro_db.csv");
+
+                    Log.i("backup", "backupDB=" + backupDB.getAbsolutePath());
+                    Log.i("backup", "sourceDB=" + currentDB.getAbsolutePath());
+
+                    FileChannel src = new FileInputStream(currentDB).getChannel();
+                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                    dst.transferFrom(src, 0, src.size());
+                    src.close();
+                    dst.close();
             }
         }catch (Exception e) {
             Log.i("Backup", e.toString());
