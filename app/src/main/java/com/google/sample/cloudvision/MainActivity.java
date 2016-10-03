@@ -47,8 +47,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,24 +144,20 @@ public class MainActivity extends AppCompatActivity {
                 fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
             }
 
-            String temp = dir.getAbsolutePath() + "/registro_db.temp";
-            File tempFile = File.createTempFile(temp,null);
+            String toPath = dir.getAbsolutePath() + "/registro_db.csv";
+            File tempFile = File.createTempFile(toPath ,null);
             BufferedWriter out = new BufferedWriter(new FileWriter(tempFile));
-            out.write(temp);
+            out.write(toPath);
             tempFile.deleteOnExit();
             out.close();
 
-           String toPath = dir.getAbsolutePath() + "/registro_db.csv";
-           BufferedWriter out2 = new BufferedWriter(new FileWriter(toPath));
-           out2.write(toPath);
-           out2.close();
+           toPath = dir.getAbsolutePath() + "/registro_db.csv";
 
 
-
-          // CopiarArchivo.getInstance();
+           //CopiarArchivo.getInstance();
            //CopiarArchivo.copiar(fromPath, toPath);
 
-           fileCopy(new File(fromPath), new File(toPath));
+           FileCopy(fromPath, toPath);
 
            MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
            MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
@@ -171,18 +165,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void FileCopy(String sourceFile, String destinationFile) {
+        System.out.println("Desde: " + sourceFile);
+        System.out.println("Hacia: " + destinationFile);
 
-    public void fileCopy(File src, File dst) throws IOException {
-        InputStream in = new FileInputStream(src);
-        OutputStream out = new FileOutputStream(dst);
+        try {
+            File inFile = new File(sourceFile);
+            File outFile = new File(destinationFile);
 
-        byte[] buf = new byte[1024];
-        int len;
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
+            FileInputStream in = new FileInputStream(inFile);
+            FileOutputStream out = new FileOutputStream(outFile);
+
+            int c;
+            while ((c = in.read()) != -1)
+                out.write(c);
+
+            in.close();
+            out.close();
+        } catch (IOException e) {
+            System.err.println("Hubo un error de entrada/salida!!!");
         }
-        in.close();
-        out.close();
     }
 
 
