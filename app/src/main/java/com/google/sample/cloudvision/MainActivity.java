@@ -45,6 +45,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -155,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
           // CopiarArchivo.getInstance();
            //CopiarArchivo.copiar(fromPath, toPath);
 
-            FileCopy(fromPath, toPath);
+           fileCopy(new File(fromPath), new File(toPath));
 
            MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
            MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
@@ -164,27 +166,18 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        public void FileCopy(String sourceFile, String destinationFile) {
-            System.out.println("Desde: " + sourceFile);
-            System.out.println("Hacia: " + destinationFile);
+    public void fileCopy(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
 
-            try {
-                File inFile = new File(sourceFile);
-                File outFile = new File(destinationFile);
-
-                FileInputStream in = new FileInputStream(inFile);
-                FileOutputStream out = new FileOutputStream(outFile);
-
-                int c;
-                while ((c = in.read()) != -1)
-                    out.write(c);
-
-                in.close();
-                out.close();
-            } catch (IOException e) {
-                System.err.println("Hubo un error de entrada/salida!!!");
-            }
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
         }
+        in.close();
+        out.close();
+    }
 
 
 
