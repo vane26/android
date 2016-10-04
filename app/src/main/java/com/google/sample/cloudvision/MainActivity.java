@@ -181,8 +181,8 @@ public class MainActivity extends AppCompatActivity {
                     File currentDB = new File(fromPath);
                     File backupDB = new File(dir.getAbsolutePath(), "registro_db.csv");
 
-                    Log.i("backup", "backupDB=" + backupDB.getAbsolutePath()+ "/MyApp");
-                    Log.i("backup", "sourceDB=" + currentDB.getAbsolutePath() + "/MyApp");
+                    Log.i("backup", "backupDB=" + backupDB.getAbsolutePath());
+                    Log.i("backup", "sourceDB=" + currentDB.getAbsolutePath());
 
                     FileChannel src = new FileInputStream(currentDB).getChannel();
                     FileChannel dst = new FileOutputStream(backupDB).getChannel();
