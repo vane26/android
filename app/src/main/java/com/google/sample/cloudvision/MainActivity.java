@@ -424,12 +424,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         List<EntityAnnotation> texts = response.getResponses().get(0).getTextAnnotations();
+        db.finalizaProceso();
+        db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
         if (texts != null) {
             for (EntityAnnotation text : texts) {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
                 //db.agregar(message);
-
 
 
 
@@ -453,8 +454,7 @@ public class MainActivity extends AppCompatActivity {
                 message += "nothing";
             }
 
-        db.finalizaProceso();
-        db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
+
 
         return message;
 
