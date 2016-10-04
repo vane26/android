@@ -224,6 +224,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
         System.out.println(String.format(FIN_PROCESO, df.format(diffHours), df.format(diffMinutes), df.format(diffSeconds)));
     }
 
+
 }
 
 

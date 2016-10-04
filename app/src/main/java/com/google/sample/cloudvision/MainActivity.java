@@ -39,6 +39,7 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
+import com.google.sample.cloudvision.BD.registro;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.BufferedWriter;
@@ -428,8 +429,10 @@ public class MainActivity extends AppCompatActivity {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
                 //db.agregar(message);
-                db.finalizaProceso();
-                db.agregar(message);
+
+               db.finalizaProceso();
+               db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
+
 
 
             }
