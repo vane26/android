@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -40,14 +39,9 @@ import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,7 +87,13 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startGalleryChooser();
-                                backupDatabase();
+                                try {
+                                    db.createDataBase();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+
 
                             }
                         })
@@ -101,7 +101,11 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
-                                backupDatabase();
+                                try {
+                                    db.createDataBase();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
 
                             }
 
@@ -123,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
+/*
     public void backupDatabase(){
         try {
             if (Environment.getExternalStorageState() != null) {
@@ -148,15 +152,12 @@ public class MainActivity extends AppCompatActivity {
                     tempFile.deleteOnExit();
                     out.close();
 
-                     MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
-                     MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
-
 
                     File currentDB = new File(fromPath);
                     File backupDB = new File(dir.getAbsolutePath(), "registro_db.csv");
 
-                    Log.i("backup", "backupDB=" + backupDB.getAbsolutePath()+ "/MyApp");
-                    Log.i("backup", "sourceDB=" + currentDB.getAbsolutePath());
+                    Log.i("backup", "backupDB=" + backupDB.getAbsolutePath());
+                    Log.i("backup", "sourceDB=" + currentDB.getAbsolutePath()+ "/MyApp");
 
                     FileChannel src = new FileInputStream(currentDB).getChannel();
                     FileChannel dst = new FileOutputStream(backupDB).getChannel();
@@ -168,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("Backup", e.toString());
         }
     }
-
+*/
 
 
 
