@@ -430,8 +430,7 @@ public class MainActivity extends AppCompatActivity {
                 message += "\n";
                 //db.agregar(message);
 
-               db.finalizaProceso();
-               db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
+
 
 
 
@@ -454,8 +453,10 @@ public class MainActivity extends AppCompatActivity {
                 message += "nothing";
             }
 
+        db.finalizaProceso();
+        db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
 
-            return message;
+        return message;
 
 
         }
