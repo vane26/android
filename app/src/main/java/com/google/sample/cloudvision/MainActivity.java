@@ -20,6 +20,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,9 +41,14 @@ import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView mImageDetails;
     private ImageView mMainImage;
     public Context myContext;
-
+    private Button Grabar;
+    EditText editIndice, editCalidad;
 
 
 
@@ -72,8 +80,31 @@ public class MainActivity extends AppCompatActivity {
         //db.getWritableDatabase(); //accion a realizar, lectura o escritura.
         db.comenzarProceso();
 
+        Grabar = (Button) findViewById(R.id.button);
+        editIndice = (EditText) findViewById(R.id.editText);
+        editCalidad = (EditText) findViewById(R.id.editText2);
+
+        Grabar.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v)
+           {
+               //Insertar una fila o registro en la tabla "registro"
+               //si la inserción es correcta devolverá true
+           boolean resultado = db.agregar2(editIndice.getText().toString(), editCalidad.getText().toString());
+           if(resultado)
+              Toast.makeText(getApplicationContext(),
+               "datos guardados correctamente", Toast.LENGTH_LONG).show();
+           else
+               Toast.makeText(getApplicationContext(),
+               "No se ha podido guardar" ,   Toast.LENGTH_LONG).show();
+                }
+           }
+        );
+
+
 
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
 
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -87,13 +118,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startGalleryChooser();
-                                try {
-                                    db.createDataBase();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-
-
+                                backupDatabase();
 
                             }
                         })
@@ -101,11 +126,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
-                                try {
-                                    db.createDataBase();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                backupDatabase();
 
                             }
 
@@ -119,15 +140,18 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
         mImageDetails = (TextView) findViewById(R.id.image_details);
         mMainImage = (ImageView) findViewById(R.id.main_image);
+
+
 
 
     }
 
 
 
-/*
+
     public void backupDatabase(){
         try {
             if (Environment.getExternalStorageState() != null) {
@@ -156,8 +180,8 @@ public class MainActivity extends AppCompatActivity {
                     File currentDB = new File(fromPath);
                     File backupDB = new File(dir.getAbsolutePath(), "registro_db.csv");
 
-                    Log.i("backup", "backupDB=" + backupDB.getAbsolutePath());
-                    Log.i("backup", "sourceDB=" + currentDB.getAbsolutePath()+ "/MyApp");
+                    Log.i("backup", "backupDB=" + backupDB.getAbsolutePath()+ "/MyApp");
+                    Log.i("backup", "sourceDB=" + currentDB.getAbsolutePath() + "/MyApp");
 
                     FileChannel src = new FileInputStream(currentDB).getChannel();
                     FileChannel dst = new FileOutputStream(backupDB).getChannel();
@@ -169,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("Backup", e.toString());
         }
     }
-*/
+
 
 
 

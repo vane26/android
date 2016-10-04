@@ -25,6 +25,12 @@ public class registro {
         this.texto = texto;
     }
 
+
+    public registro(String indice, String calidad){
+        this.indice = indice;
+        this.calidad = calidad;
+    }
+
     public String getIndice() {
         return indice;
     }

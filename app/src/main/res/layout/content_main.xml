@@ -14,7 +14,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="false">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -26,7 +27,57 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Pulsa boton para seleccionar tu imagen."/>
+                android:text="completa los campos y luego selecciona una imagen"
+                android:autoText="false" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Indica número de imagen"
+                android:id="@+id/textView" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/editText"
+                android:layout_above="@+id/editText2"
+                android:layout_alignParentStart="true"
+                android:clickable="false"
+                android:contextClickable="false"
+                android:editable="false" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Indica calidad de tu imagen"
+                android:id="@+id/textView2" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/editText2"
+                android:layout_above="@+id/button"
+                android:layout_alignParentStart="true"
+                android:contextClickable="false"
+                android:editable="false" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Grabar"
+                android:id="@+id/button"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginBottom="53dp"
+                android:layout_alignParentEnd="false"
+                android:allowUndo="false"
+                android:backgroundTint="@color/material_deep_teal_500" />
 
             <ImageView
                 android:id="@+id/main_image"
@@ -35,4 +86,5 @@
                 android:scaleType="fitCenter"/>
         </LinearLayout>
     </ScrollView>
+
 </RelativeLayout>
