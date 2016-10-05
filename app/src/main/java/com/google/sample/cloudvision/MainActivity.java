@@ -18,7 +18,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.method.DialerKeyListener;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -86,32 +85,35 @@ public class MainActivity extends AppCompatActivity {
         //Grabar = (Button) findViewById(R.id.button);
         editIndice = (EditText) findViewById(R.id.editText);
         editIndice.setVisibility(View.INVISIBLE);
-        editIndice.setKeyListener(DialerKeyListener.getInstance());
+
 
         editCalidad = (EditText) findViewById(R.id.editText2);
         editCalidad.setVisibility(View.INVISIBLE);
-        editCalidad.setKeyListener(DialerKeyListener.getInstance());
+
 
         textView = (TextView) findViewById(R.id.textView);
         textView.setVisibility(View.INVISIBLE);
-        textView.setKeyListener(DialerKeyListener.getInstance());
+
 
         textView1 = (TextView) findViewById(R.id.textView2);
         textView1.setVisibility(View.INVISIBLE);
-        textView1.setKeyListener(DialerKeyListener.getInstance());
+
 
 
         textView4 = (TextView) findViewById(R.id.textView);
         textView4.setVisibility(View.INVISIBLE);
-        textView4.setKeyListener(DialerKeyListener.getInstance());
+
 
         textView4 = (TextView) findViewById(R.id.textView4);
         textView4.setVisibility(View.INVISIBLE);
-        textView4.setKeyListener(DialerKeyListener.getInstance());
+
 
 
 
         final FloatingActionButton grabar = (FloatingActionButton) findViewById(R.id.grabar);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setVisibility(View.INVISIBLE);
+
 
 
         grabar.setOnClickListener(new View.OnClickListener() {
@@ -135,9 +137,11 @@ public class MainActivity extends AppCompatActivity {
                                 //si la inserción es correcta devolverá true
                                  if ((editIndice.length() != 0) && (editCalidad.length() != 0)) { // si los campos estan vacios puede grabar
                                      boolean resultado = db.agregar2(editIndice.getText().toString(), editCalidad.getText().toString());
-                                      if (resultado)
+                                      if (resultado){
                                             Toast.makeText(getApplicationContext(),
                                              "datos guardados correctamente", Toast.LENGTH_LONG).show();
+                                             fab.setVisibility(View.VISIBLE);
+                                      }
                                       else
                                             Toast.makeText(getApplicationContext(),
                                                 "No se ha podido guardar", Toast.LENGTH_LONG).show();
@@ -166,7 +170,6 @@ public class MainActivity extends AppCompatActivity {
 
     });
 
-         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
         grabar.callOnClick();
 
