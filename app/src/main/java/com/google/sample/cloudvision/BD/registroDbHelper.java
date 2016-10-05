@@ -93,40 +93,6 @@ public class registroDbHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void agregar(String texto) {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        if (db != null) {
-            ContentValues values = new ContentValues();
-            registro registro = new registro(texto);
-            values.put("TEXTO ", registro.getTexto());
-            db.insert(registroContract.registroEntry.table_name, null, values);
-        }
-        db.close();
-
-
-    }
-
-    public boolean agregar2(String indice, String calidad) {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        if (db != null) {
-            ContentValues values = new ContentValues();
-            registro registro = new registro(indice, calidad);
-            values.put("INDICE ", registro.getIndice());
-            values.put("CALIDAD ", registro.getCalidad());
-            db.insert(registroContract.registroEntry.table_name, null, values);
-        }
-        db.close();
-
-
-        return true;
-    }
-
-
-
-
-
 
     public int update(registro registro) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -137,13 +103,6 @@ public class registroDbHelper extends SQLiteOpenHelper {
         return db.update(registroContract.registroEntry.table_name, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getIndice())});
         }
 
-    public int update(String texto) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        registro registro = new registro(texto);
-        values.put("TEXTO ", registro.getTexto());
-        return db.update(registroContract.registroEntry.table_name, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getTexto())});
-    }
 
 
 
@@ -175,23 +134,6 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
-    public List<registro> ListadoGeneraluno() {
-        List<registro> listado = new ArrayList<>();
-        String selectQuery = "SELECT TEXTO FROM " + registroContract.registroEntry.table_name;
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                registro registro = new registro();
-                registro.setTexto(cursor.getString(0));
-                listado.add(registro);
-
-            } while (cursor.moveToNext());
-        }
-        return listado;
-    }
 
 
     public int getRegistro(){

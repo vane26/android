@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -42,14 +43,13 @@ import com.google.api.services.vision.v1.model.Image;
 import com.google.sample.cloudvision.BD.registro;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,11 +136,13 @@ public class MainActivity extends AppCompatActivity {
                                 //Insertar una fila o registro en la tabla "registro"
                                 //si la inserción es correcta devolverá true
                                  if ((editIndice.length() != 0) && (editCalidad.length() != 0)) { // si los campos estan vacios puede grabar
-                                     boolean resultado = db.agregar2(editIndice.getText().toString(), editCalidad.getText().toString());
+                                     boolean resultado = true;
+                                     //db.agregar2(editIndice.getText().toString(), editCalidad.getText().toString());
                                       if (resultado){
                                             Toast.makeText(getApplicationContext(),
                                              "datos guardados correctamente", Toast.LENGTH_LONG).show();
                                              fab.setVisibility(View.VISIBLE);
+                                             grabar.setVisibility(View.INVISIBLE);
                                       }
                                       else
                                             Toast.makeText(getApplicationContext(),
@@ -172,12 +174,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         grabar.callOnClick();
-
-
-
-
          fab.setOnClickListener(new View.OnClickListener() {
-
 
              @Override
              public void onClick(View view) {
@@ -191,7 +188,11 @@ public class MainActivity extends AppCompatActivity {
                              @Override
                              public void onClick(DialogInterface dialog, int which) {
                                  startGalleryChooser();
-                                 backupDatabase();
+                                 try {
+                                     backupDatabase(fab);
+                                 } catch (IOException e) {
+                                     e.printStackTrace();
+                                 }
 
 
                              }
@@ -200,7 +201,11 @@ public class MainActivity extends AppCompatActivity {
                              @Override
                              public void onClick(DialogInterface dialog, int which) {
                                  startCamera();
-                                 backupDatabase();
+                                 try {
+                                     backupDatabase(fab);
+                                 } catch (IOException e) {
+                                     e.printStackTrace();
+                                 }
 
                              }
 
@@ -226,75 +231,52 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void backupDatabase(){
-        try {
-            if (Environment.getExternalStorageState() != null) {
-                    File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
-                    if (dir.exists()) {
-                    } else {
-                        dir.mkdir();
-                    }
-
-                    String fromPath = "";
-                    if (android.os.Build.VERSION.SDK_INT >= 4.2) {
-                        fromPath = getApplicationInfo().dataDir + "/databases/" + "registro_db.csv";
-                    } else {
-                        fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
-                    }
-
-                    String toPath = dir.getAbsolutePath() + "/registro_db.temp";
-                    File tempFile = File.createTempFile(toPath ,null);
-                    BufferedWriter out = new BufferedWriter(new FileWriter(tempFile));
-                    out.write(toPath);
-                    out.write(toPath);
-                    tempFile.deleteOnExit();
-                    out.close();
-
-
-                    File currentDB = new File(fromPath);
-                    File backupDB = new File(dir.getAbsolutePath(), "registro_db.csv");
-
-                    Log.i("backup", "backupDB=" + backupDB.getAbsolutePath());
-                    Log.i("backup", "sourceDB=" + currentDB.getAbsolutePath());
-
-                    FileChannel src = new FileInputStream(currentDB).getChannel();
-                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
-                    dst.transferFrom(src, 0, src.size());
-                    src.close();
-                    dst.close();
+    public void backupDatabase(View v) throws IOException {
+        if (Environment.getExternalStorageState() != null)
+        {
+            File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
+            if (dir.exists()) {
+                //dir.delete();
             }
-        }catch (Exception e) {
-            Log.i("Backup", e.toString());
+            else {
+                dir.mkdir();
+            }
+
+            String fromPath = "";
+            if(android.os.Build.VERSION.SDK_INT >= 4.2){
+                fromPath = getApplicationInfo().dataDir + "/databases/" + "registro_db.csv";
+            }
+            else
+            {
+                fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
+            }
+
+            String toPath = dir.getAbsolutePath() + "/registro_db.csv";
+
+            fileCopy(new File(fromPath), new File(toPath));
+
+            //This is to refresh the folders in Windows USB conn.
+            MediaScannerConnection.scanFile(this, new String[] { Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp" }, null, null);
+            MediaScannerConnection.scanFile(this, new String[] { toPath }, null, null);
         }
     }
 
 
 
 
-    /*
-    public void FileCopy(String sourceFile, String destinationFile) {
-        System.out.println("Desde: " + sourceFile);
-        System.out.println("Hacia: " + destinationFile);
 
-        try {
-            File inFile = new File(sourceFile);
-            File outFile = new File(destinationFile);
+    public void fileCopy(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
 
-            FileInputStream in = new FileInputStream(inFile);
-            FileOutputStream out = new FileOutputStream(outFile);
-
-            int c;
-            while ((c = in.read()) != -1)
-                out.write(c);
-
-            in.close();
-            out.close();
-        } catch (IOException e) {
-            System.err.println("Hubo un error de entrada/salida!!!");
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
         }
+        in.close();
+        out.close();
     }
-
-*/
 
 
 
@@ -500,14 +482,14 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (texts != null) {
-            db.finalizaProceso();
-            db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
             for (EntityAnnotation text : texts) {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
                 //db.agregar(message);
 
             }
+            db.finalizaProceso();
+            db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
         } else {
                 message += "nothing";
 
@@ -535,14 +517,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-/*
-    public long medirtiempo(){
-        long tiempoInicio = System.currentTimeMillis();
-        long totalTiempo = System.currentTimeMillis() - tiempoInicio;
-        System.out.println("El tiempo total de la ejecución es :" + totalTiempo + " miliseg");
-        return totalTiempo;
-    }
-*/
 
 
     }
