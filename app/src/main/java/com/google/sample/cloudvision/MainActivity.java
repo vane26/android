@@ -18,6 +18,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.method.DialerKeyListener;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -64,8 +65,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView mImageDetails;
     private ImageView mMainImage;
     public Context myContext;
-    private Button Grabar;
+    private Button Guardar;
     EditText editIndice, editCalidad;
+    TextView textView, textView1, textView4;
 
 
 
@@ -81,65 +83,132 @@ public class MainActivity extends AppCompatActivity {
         //db.getWritableDatabase(); //accion a realizar, lectura o escritura.
         db.comenzarProceso();
 
-        Grabar = (Button) findViewById(R.id.button);
+        //Grabar = (Button) findViewById(R.id.button);
         editIndice = (EditText) findViewById(R.id.editText);
+        editIndice.setVisibility(View.INVISIBLE);
+        editIndice.setKeyListener(DialerKeyListener.getInstance());
+
         editCalidad = (EditText) findViewById(R.id.editText2);
+        editCalidad.setVisibility(View.INVISIBLE);
+        editCalidad.setKeyListener(DialerKeyListener.getInstance());
 
-        Grabar.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v)
-           {
-               //Insertar una fila o registro en la tabla "registro"
-               //si la inserción es correcta devolverá true
-           boolean resultado = db.agregar2(editIndice.getText().toString(), editCalidad.getText().toString());
-           if(resultado)
-              Toast.makeText(getApplicationContext(),
-               "datos guardados correctamente", Toast.LENGTH_LONG).show();
-           else
-               Toast.makeText(getApplicationContext(),
-               "No se ha podido guardar" ,   Toast.LENGTH_LONG).show();
-                }
-           }
-        );
+        textView = (TextView) findViewById(R.id.textView);
+        textView.setVisibility(View.INVISIBLE);
+        textView.setKeyListener(DialerKeyListener.getInstance());
+
+        textView1 = (TextView) findViewById(R.id.textView2);
+        textView1.setVisibility(View.INVISIBLE);
+        textView1.setKeyListener(DialerKeyListener.getInstance());
 
 
+        textView4 = (TextView) findViewById(R.id.textView);
+        textView4.setVisibility(View.INVISIBLE);
+        textView4.setKeyListener(DialerKeyListener.getInstance());
 
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        textView4 = (TextView) findViewById(R.id.textView4);
+        textView4.setVisibility(View.INVISIBLE);
+        textView4.setKeyListener(DialerKeyListener.getInstance());
 
 
 
-        fab.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder
-                        .setMessage(R.string.dialog_select_prompt)
-                        .setPositiveButton(R.string.dialog_select_gallery, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                startGalleryChooser();
-                                backupDatabase();
-
-                            }
-                        })
-                        .setNegativeButton(R.string.dialog_select_camera, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                startCamera();
-                                backupDatabase();
-
-                            }
+        final FloatingActionButton grabar = (FloatingActionButton) findViewById(R.id.grabar);
 
 
+        grabar.setOnClickListener(new View.OnClickListener() {
+
+
+             @Override
+             public void onClick(final View v) {
+                 AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
+                 builder1
+
+                        .setMessage(R.string.dialog_select_registro)
+                        .setPositiveButton(R.string.dialog_select_grabar, new DialogInterface.OnClickListener() {
+                             @Override
+                             public void onClick(DialogInterface dialog, int which) {
+                                 editIndice.setVisibility(View.VISIBLE);
+                                 editCalidad.setVisibility(View.VISIBLE);
+                                 textView.setVisibility(View.VISIBLE);
+                                 textView1.setVisibility(View.VISIBLE);
+                                 textView4.setVisibility(View.VISIBLE);
+                                //Insertar una fila o registro en la tabla "registro"
+                                //si la inserción es correcta devolverá true
+                                 if ((editIndice.length() != 0) && (editCalidad.length() != 0)) { // si los campos estan vacios puede grabar
+                                     boolean resultado = db.agregar2(editIndice.getText().toString(), editCalidad.getText().toString());
+                                      if (resultado)
+                                            Toast.makeText(getApplicationContext(),
+                                             "datos guardados correctamente", Toast.LENGTH_LONG).show();
+                                      else
+                                            Toast.makeText(getApplicationContext(),
+                                                "No se ha podido guardar", Toast.LENGTH_LONG).show();
+                                 }
+                                 else
+                                     Toast.makeText(getApplicationContext(),
+                                         "Debe completar los campos antes de grabar", Toast.LENGTH_LONG).show();
+
+                             }
+
+                         })
+                        .setNegativeButton(R.string.dialog_select_salir, new DialogInterface.OnClickListener() {
+                             @Override
+                             public void onClick(DialogInterface dialog, int which) {
+                                 setResult(RESULT_OK);
+                                 finish();
+
+                             }
                         });
 
-                builder.create().show();
-            }
 
 
-        });
+            builder1.create().show();
+        }
 
+
+    });
+
+         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        grabar.callOnClick();
+
+
+
+
+         fab.setOnClickListener(new View.OnClickListener() {
+
+
+             @Override
+             public void onClick(View view) {
+
+
+                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                 builder
+
+                         .setMessage(R.string.dialog_select_prompt)
+                         .setPositiveButton(R.string.dialog_select_gallery, new DialogInterface.OnClickListener() {
+                             @Override
+                             public void onClick(DialogInterface dialog, int which) {
+                                 startGalleryChooser();
+                                 backupDatabase();
+
+
+                             }
+                         })
+                         .setNegativeButton(R.string.dialog_select_camera, new DialogInterface.OnClickListener() {
+                             @Override
+                             public void onClick(DialogInterface dialog, int which) {
+                                 startCamera();
+                                 backupDatabase();
+
+                             }
+
+
+                         });
+
+                 builder.create().show();
+             }
+
+
+         });
 
 
         mImageDetails = (TextView) findViewById(R.id.image_details);
@@ -149,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
 
 
 
@@ -424,16 +494,15 @@ public class MainActivity extends AppCompatActivity {
 
 
         List<EntityAnnotation> texts = response.getResponses().get(0).getTextAnnotations();
-        db.finalizaProceso();
-        db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
+
+
         if (texts != null) {
+            db.finalizaProceso();
+            db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
             for (EntityAnnotation text : texts) {
                 message += String.format("%s: %s", text.getScore(), text.getDescription());
                 message += "\n";
                 //db.agregar(message);
-
-
-
 
             }
         } else {

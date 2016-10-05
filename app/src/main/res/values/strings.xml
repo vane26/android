@@ -9,5 +9,14 @@
     <string name="dialog_select_camera">Camera</string>
     <string name="dialog_select_gallery">Gallery</string>
 
+
+    <string name="dialog_select_registro">Guarda datos para continuar</string>
+    <string name="dialog_select_grabar">Guardar</string>
+    <string name="dialog_select_salir">Salir</string>
+
+
+
+
+
     <string name="image_picker_error">Algo está mal con esa imagen. Elige una diferente.</string>
 </resources>
