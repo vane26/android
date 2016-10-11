@@ -44,7 +44,12 @@ import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
     EditText editIndice, editCalidad;
     TextView textView, textView1, textView4;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,15 +79,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
-        try {
-            db.createDataBase();
-            db.openDataBase();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-
         //db.getWritableDatabase(); //accion a realizar, lectura o escritura.
         db.comenzarProceso();
 
@@ -130,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
                                 editCalidad.setVisibility(View.VISIBLE);
                                 textView.setVisibility(View.VISIBLE);
                                 textView1.setVisibility(View.VISIBLE);
-                                textView4.setVisibility(View.VISIBLE);
                                 //Insertar una fila o registro en la tabla "registro"
                                 //si la inserción es correcta devolverá true
                                 if ((editIndice.length() != 0) && (editCalidad.length() != 0)) { // si los campos estan vacios puede grabar
@@ -141,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
                                                 "datos guardados correctamente", Toast.LENGTH_LONG).show();
                                         fab.setVisibility(View.VISIBLE);
                                         grabar.setVisibility(View.INVISIBLE);
+                                        textView4.setVisibility(View.VISIBLE);
                                     } else
                                         Toast.makeText(getApplicationContext(),
                                                 "No se ha podido guardar", Toast.LENGTH_LONG).show();
@@ -183,12 +181,13 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startGalleryChooser();
-
-                               /* try {
-                                    backupDatabase(fab);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }*/
+                                backupdDatabase();
+                                 /*
+                                 try {
+                                     backupDatabase(fab);
+                                 } catch (IOException e) {
+                                     e.printStackTrace();
+                                 }*/
 
 
                             }
@@ -197,11 +196,14 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
-                                /* try {
-                                    backupDatabase(fab);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }*/
+                                backupdDatabase();
+                                  /*
+                                 try {
+                                     backupDatabase(fab);
+                                 } catch (IOException e) {
+                                     e.printStackTrace();
+                                 }*/
+
 
                             }
 
@@ -223,19 +225,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-   /* public void backupDatabase(View v) throws IOException {
-        if (Environment.getExternalStorageState() != null) {
+
+
+/*
+    public void backupDatabase(View v) throws IOException {
+        if (Environment.getExternalStorageState() != null)
+        {
             File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
             if (dir.exists()) {
                 //dir.delete();
-            } else {
+            }
+            else {
                 dir.mkdir();
             }
 
             String fromPath = "";
-            if (Build.VERSION.SDK_INT >= 4.2) {
+            if(android.os.Build.VERSION.SDK_INT >= 4.2){
                 fromPath = getApplicationInfo().dataDir + "/databases/" + "registro_db.csv";
-            } else {
+            }
+            else
+            {
                 fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
             }
 
@@ -244,12 +253,51 @@ public class MainActivity extends AppCompatActivity {
             fileCopy(new File(fromPath), new File(toPath));
 
             //This is to refresh the folders in Windows USB conn.
-            MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
-            MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
+            MediaScannerConnection.scanFile(this, new String[] { Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp" }, null, null);
+            MediaScannerConnection.scanFile(this, new String[] { toPath }, null, null);
         }
     }
 
 
+*/
+
+
+    public void backupdDatabase() {
+        try {
+            File sd = Environment.getExternalStorageDirectory();
+            File data = Environment.getDataDirectory();
+
+            if (sd.canWrite()) {
+                String currentDBPath = "";
+                if(android.os.Build.VERSION.SDK_INT >= 4.2){
+                    currentDBPath = getApplicationInfo().dataDir + "/databases/" + "registro_db.csv";
+                }
+                else
+                {
+                    currentDBPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
+                }
+
+
+
+                String backupDBPath = "registro_db.csv";
+                File currentDB = new File(currentDBPath);
+                File backupDB = new File(sd, backupDBPath);
+
+                fileCopy(new File(currentDBPath), new File(sd, backupDBPath));
+
+
+                if (currentDB.exists()) {
+                    FileChannel src = new FileInputStream(currentDB).getChannel();
+                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                    dst.transferFrom(src, 0, src.size());
+                    src.close();
+                    dst.close();
+                }
+            }
+        } catch (Exception e) {
+
+        }
+    }
     public void fileCopy(File src, File dst) throws IOException {
         InputStream in = new FileInputStream(src);
         OutputStream out = new FileOutputStream(dst);
@@ -262,9 +310,7 @@ public class MainActivity extends AppCompatActivity {
         in.close();
         out.close();
     }
-    */
-
-
+}
     public void startGalleryChooser() {
         Intent intent = new Intent();
         intent.setType("image/*");
