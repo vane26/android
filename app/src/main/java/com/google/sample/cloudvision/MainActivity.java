@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -44,12 +45,7 @@ import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private Button Guardar;
     EditText editIndice, editCalidad;
     TextView textView, textView1, textView4;
+    CopiarArchivo copia;
 
 
 
@@ -264,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void backupdDatabase() {
         try {
-            File sd = Environment.getExternalStorageDirectory();
+            File sd = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyVision");
             File data = Environment.getDataDirectory();
 
             if (sd.canWrite()) {
@@ -279,38 +276,24 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-                String backupDBPath = "registro_db.csv";
-                File currentDB = new File(currentDBPath);
-                File backupDB = new File(sd, backupDBPath);
+                String backupDBPath = sd.getAbsolutePath() + "/registro_db.csv";
+               // File currentDB = new File(currentDBPath);
+              //  File backupDB = new File(sd, backupDBPath);
 
-                fileCopy(new File(currentDBPath), new File(sd, backupDBPath));
+                copia.getInstance();
+                copia.copiar(currentDBPath, backupDBPath);
 
 
-                if (currentDB.exists()) {
-                    FileChannel src = new FileInputStream(currentDB).getChannel();
-                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
-                    dst.transferFrom(src, 0, src.size());
-                    src.close();
-                    dst.close();
-                }
+                MediaScannerConnection.scanFile(this, new String[] { Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp" }, null, null);
+                MediaScannerConnection.scanFile(this, new String[] { backupDBPath }, null, null);
+
+
             }
         } catch (Exception e) {
 
         }
     }
-    public void fileCopy(File src, File dst) throws IOException {
-        InputStream in = new FileInputStream(src);
-        OutputStream out = new FileOutputStream(dst);
 
-        byte[] buf = new byte[1024];
-        int len;
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
-        }
-        in.close();
-        out.close();
-    }
-}
     public void startGalleryChooser() {
         Intent intent = new Intent();
         intent.setType("image/*");
