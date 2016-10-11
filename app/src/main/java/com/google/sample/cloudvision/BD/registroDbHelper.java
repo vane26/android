@@ -3,10 +3,15 @@ package com.google.sample.cloudvision.BD;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,7 +37,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
     public Date fechaInicio;
 
     // SQLiteDatabase db;
-    registroDbHelper db;
+    SQLiteDatabase db;
     private final Context myContext;
     private static SQLiteDatabase.CursorFactory factory = null;
 
@@ -58,6 +63,50 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     }
 
+    public void createDataBase() throws IOException {
+
+        boolean dbExist = checkDataBase();
+
+        if (dbExist) {
+            // Si existe, no haemos nada!
+        } else {
+            // Llamando a este método se crea la base de datos vacía en la ruta
+            // por defecto del sistema de nuestra aplicación por lo que
+            // podremos sobreescribirla con nuestra base de datos.
+            this.getReadableDatabase();
+
+            try {
+
+                copyDataBase();
+
+            } catch (IOException e) {
+
+                throw new Error("Error copiando database");
+            }
+        }
+    }
+
+    private boolean checkDataBase() {
+
+        SQLiteDatabase checkDB = null;
+
+        try {
+            String myPath = db_path + data_base;
+            checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+
+        } catch (SQLiteException e) {
+            // Base de datos no creada todavia
+        }
+
+        if (checkDB != null) {
+
+            checkDB.close();
+        }
+
+        return checkDB != null ? true : false;
+
+    }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { //codigo en caso de querer crear mas campos en nuestra base de datos
@@ -67,17 +116,42 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
     //conexiones
-    public void abrir() {
-        Log.i("SQLite ", "Se abre conexion a la base de datos " + db.getWritableDatabase());
+    public void openDataBase() throws SQLException {
 
+        // Open the database
+        String myPath = db_path + data_base;
+        db = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
     }
 
 
-    public void close() {
-        if (db != null)
-            Log.i("SQLite ", "Se cierra conexion a la base de datos ");
-        db.close();
+    @Override
+    public synchronized void close() {
+         if (db != null)
+            db.close();
+
+        super.close();
     }
+
+    private void copyDataBase() throws IOException {
+
+        OutputStream databaseOutputStream = new FileOutputStream("" + db_path + data_base);
+        InputStream databaseInputStream;
+
+        byte[] buffer = new byte[1024];
+        int length;
+
+        databaseInputStream = myContext.getAssets().open("registro_db.csv");
+        while ((length = databaseInputStream.read(buffer)) > 0) {
+            databaseOutputStream.write(buffer);
+        }
+
+        databaseInputStream.close();
+        databaseOutputStream.flush();
+        databaseOutputStream.close();
+    }
+
+
+
 
 
     //metodos insert, update, query
