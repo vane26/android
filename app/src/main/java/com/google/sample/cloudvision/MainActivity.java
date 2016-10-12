@@ -9,8 +9,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -26,6 +28,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpTransport;
@@ -52,8 +57,9 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +78,11 @@ public class MainActivity extends AppCompatActivity {
     EditText editIndice, editCalidad;
     TextView textView, textView1, textView4;
     CopiarArchivo copia;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
 
     @Override
@@ -185,13 +196,12 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startGalleryChooser();
-                                backupdDatabase();
-                                 /*
-                                 try {
-                                     backupDatabase(fab);
-                                 } catch (IOException e) {
-                                     e.printStackTrace();
-                                 }*/
+                                try {
+                                    backupDatabase(fab);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
 
 
                             }
@@ -200,13 +210,11 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
-                                backupdDatabase();
-                                  /*
-                                 try {
+                                try {
                                      backupDatabase(fab);
                                  } catch (IOException e) {
                                      e.printStackTrace();
-                                 }*/
+                                 }
 
 
                             }
@@ -225,95 +233,56 @@ public class MainActivity extends AppCompatActivity {
         mMainImage = (ImageView) findViewById(R.id.main_image);
 
 
-
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
 
-
-
-/*
-    public void backupDatabase(View v) throws IOException {
-        if (Environment.getExternalStorageState() != null)
-        {
+    public void backupDatabase(View view) throws IOException {
+        if (Environment.getExternalStorageState() != null) {
             File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
             if (dir.exists()) {
                 //dir.delete();
-            }
-            else {
+            } else {
                 dir.mkdir();
             }
 
             String fromPath = "";
-            if(android.os.Build.VERSION.SDK_INT >= 4.2){
+            if (Build.VERSION.SDK_INT >= 4.2) {
                 fromPath = getApplicationInfo().dataDir + "/databases/" + "registro_db.csv";
-            }
-            else
-            {
+            } else {
                 fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
             }
 
             String toPath = dir.getAbsolutePath() + "/registro_db.csv";
 
-            fileCopy(new File(fromPath), new File(toPath));
+
+            File fromPathDB = new File(fromPath);
+            File toPathDB = new File(toPath);
+            fileCopy(fromPathDB, toPathDB);
+            agregaContenidoArchivo(toPathDB, obtieneContenidoArchivo(fromPathDB));
+
 
             //This is to refresh the folders in Windows USB conn.
-            MediaScannerConnection.scanFile(this, new String[] { Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp" }, null, null);
-            MediaScannerConnection.scanFile(this, new String[] { toPath }, null, null);
+            MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
+            MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
         }
     }
 
 
-*/
+    public void fileCopy(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
 
-
-    public void backupdDatabase() {
-        try {
-            File sd = Environment.getExternalStorageDirectory();
-            File data = Environment.getDataDirectory();
-
-
-
-            if (sd.canWrite()) {
-                String currentDBPath = "";
-                if(android.os.Build.VERSION.SDK_INT >= 4.2){
-                    currentDBPath = getApplicationInfo().dataDir + "/databases/" + "registro_db.csv";
-                }
-                else
-                {
-                    currentDBPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
-                }
-
-
-
-
-
-                String backupDBPath = "";
-
-
-                File currentDB = new File(currentDBPath);
-                File backupDB = new File(sd, backupDBPath);
-
-
-
-                agregaContenidoArchivo(backupDB, obtieneContenidoArchivo(currentDB));
-
-
-                if (currentDB.exists()) {
-                    FileChannel src = new FileInputStream(currentDB).getChannel();
-                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
-                    dst.transferFrom(src, 0, src.size());
-                    src.close();
-                    dst.close();
-                }
-            }
-        } catch (Exception e) {
-
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
         }
-
-}
-
-
-
+        in.close();
+        out.close();
+    }
 
 
     static public String obtieneContenidoArchivo(File archivoAbierto) {
@@ -321,26 +290,22 @@ public class MainActivity extends AppCompatActivity {
         StringBuilder contenido = new StringBuilder();
 
         try {
-            BufferedReader entrada =  new BufferedReader(new FileReader(archivoAbierto));
+            BufferedReader entrada = new BufferedReader(new FileReader(archivoAbierto));
             try {
                 String line = null;
-                while (( line = entrada.readLine()) != null){
+                while ((line = entrada.readLine()) != null) {
                     contenido.append(line);
                     contenido.append(System.getProperty("line.separator"));
                 }
-            }
-            finally {
+            } finally {
                 entrada.close();
             }
-        }
-        catch (IOException ex){
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
 
         return contenido.toString();
     }
-
-
 
 
     static public void agregaContenidoArchivo(File archivoAbierto, String contenido)
@@ -349,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
             throw new IllegalArgumentException("El archivo no debe ser nulo.");
         }
         if (!archivoAbierto.exists()) {
-            throw new FileNotFoundException ("el archivo no existe: " + archivoAbierto);
+            throw new FileNotFoundException("el archivo no existe: " + archivoAbierto);
         }
         if (!archivoAbierto.isFile()) {
             throw new IllegalArgumentException("no debe ser un directorio: " + archivoAbierto);
@@ -360,13 +325,11 @@ public class MainActivity extends AppCompatActivity {
 
         Writer output = new BufferedWriter(new FileWriter(archivoAbierto));
         try {
-            output.write( contenido );
-        }
-        finally {
+            output.write(contenido);
+        } finally {
             output.close();
         }
     }
-
 
 
     public void startGalleryChooser() {
@@ -600,7 +563,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onStart() {
+        super.onStart();
 
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.google.sample.cloudvision/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.google.sample.cloudvision/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
+    }
 }
 
 
