@@ -257,6 +257,12 @@ public class MainActivity extends AppCompatActivity {
 
             String toPath = dir.getAbsolutePath() + "/registro_db.csv";
 
+            File tempFile = File.createTempFile(toPath,null);
+            BufferedWriter out = new BufferedWriter(new FileWriter(tempFile));
+            out.write(toPath);
+            tempFile.deleteOnExit();
+            out.close();
+
 
             File fromPathDB = new File(fromPath);
             File toPathDB = new File(toPath);
