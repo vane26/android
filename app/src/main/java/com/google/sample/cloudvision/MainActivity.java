@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -43,9 +42,18 @@ import com.google.api.services.vision.v1.model.Image;
 import com.google.sample.cloudvision.BD.registro;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
     EditText editIndice, editCalidad;
     TextView textView, textView1, textView4;
     CopiarArchivo copia;
-
 
 
     @Override
@@ -261,8 +268,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void backupdDatabase() {
         try {
-            File sd = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyVision");
+            File sd = Environment.getExternalStorageDirectory();
             File data = Environment.getDataDirectory();
+
+
 
             if (sd.canWrite()) {
                 String currentDBPath = "";
@@ -276,23 +285,89 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-                String backupDBPath = sd.getAbsolutePath() + "/registro_db.csv";
-               // File currentDB = new File(currentDBPath);
-              //  File backupDB = new File(sd, backupDBPath);
-
-                copia.getInstance();
-                copia.copiar(currentDBPath, backupDBPath);
 
 
-                MediaScannerConnection.scanFile(this, new String[] { Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp" }, null, null);
-                MediaScannerConnection.scanFile(this, new String[] { backupDBPath }, null, null);
+                String backupDBPath = "";
 
 
+                File currentDB = new File(currentDBPath);
+                File backupDB = new File(sd, backupDBPath);
+
+
+
+                agregaContenidoArchivo(backupDB, obtieneContenidoArchivo(currentDB));
+
+
+                if (currentDB.exists()) {
+                    FileChannel src = new FileInputStream(currentDB).getChannel();
+                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                    dst.transferFrom(src, 0, src.size());
+                    src.close();
+                    dst.close();
+                }
             }
         } catch (Exception e) {
 
         }
+
+}
+
+
+
+
+
+    static public String obtieneContenidoArchivo(File archivoAbierto) {
+
+        StringBuilder contenido = new StringBuilder();
+
+        try {
+            BufferedReader entrada =  new BufferedReader(new FileReader(archivoAbierto));
+            try {
+                String line = null;
+                while (( line = entrada.readLine()) != null){
+                    contenido.append(line);
+                    contenido.append(System.getProperty("line.separator"));
+                }
+            }
+            finally {
+                entrada.close();
+            }
+        }
+        catch (IOException ex){
+            ex.printStackTrace();
+        }
+
+        return contenido.toString();
     }
+
+
+
+
+    static public void agregaContenidoArchivo(File archivoAbierto, String contenido)
+            throws FileNotFoundException, IOException {
+        if (archivoAbierto == null) {
+            throw new IllegalArgumentException("El archivo no debe ser nulo.");
+        }
+        if (!archivoAbierto.exists()) {
+            throw new FileNotFoundException ("el archivo no existe: " + archivoAbierto);
+        }
+        if (!archivoAbierto.isFile()) {
+            throw new IllegalArgumentException("no debe ser un directorio: " + archivoAbierto);
+        }
+        if (!archivoAbierto.canWrite()) {
+            throw new IllegalArgumentException("El archivo no puede ser escrito: " + archivoAbierto);
+        }
+
+        Writer output = new BufferedWriter(new FileWriter(archivoAbierto));
+        try {
+            output.write( contenido );
+        }
+        finally {
+            output.close();
+        }
+    }
+
+
 
     public void startGalleryChooser() {
         Intent intent = new Intent();
