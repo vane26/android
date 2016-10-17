@@ -8,6 +8,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -47,6 +49,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -184,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
+                                exportDB();
 
 
                             }
@@ -197,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
                                  } catch (IOException e) {
                                      e.printStackTrace();
                                  }
+                                exportDB();
 
 
                             }
@@ -263,7 +268,33 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    private void exportDB() {
 
+        File dbFile = getDatabasePath("registro_db.db");
+        registroDbHelper dbhelper = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
+        File exportDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
+        if (!exportDir.exists()) {
+            exportDir.mkdirs();
+        }
+
+        File file = new File(exportDir, "registro_db.csv");
+        try {
+            file.createNewFile();
+            CsvWriter csvWrite = new CsvWriter(new FileWriter(file));
+            SQLiteDatabase db = dbhelper.getReadableDatabase();
+            Cursor curCSV = db.rawQuery("SELECT * FROM registro", null);
+            csvWrite.writeNext(curCSV.getColumnNames());
+            while (curCSV.moveToNext()) {
+                //Which column you want to exprort
+                String arrStr[] = {curCSV.getString(0), curCSV.getString(1), curCSV.getString(2),curCSV.getString(3)};
+                csvWrite.writeNext(arrStr);
+            }
+            csvWrite.close();
+            curCSV.close();
+        } catch (Exception sqlEx) {
+            Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
+        }
+    }
 
 
 
