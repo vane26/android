@@ -5,7 +5,6 @@
 package com.google.sample.cloudvision;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -23,7 +22,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -64,11 +62,11 @@ public class MainActivity extends AppCompatActivity {
     registroDbHelper db;
     private TextView mImageDetails;
     private ImageView mMainImage;
-    public Context myContext;
-    private Button Guardar;
+    //public Context myContext;
+    //private Button Guardar;
     EditText editIndice, editCalidad;
     TextView textView, textView1, textView4;
-    CopiarArchivo copia;
+    //CopiarArchivo copia;
 
 
     @Override
@@ -224,11 +222,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
-
-
-    public void backupDatabase(View view) throws IOException {
+    public void backupDatabase(View view) throws IOException { //hace copia de respaldo .db
         if (Environment.getExternalStorageState() != null) {
             File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
             if (dir.exists()) {
@@ -268,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void exportDB() {
+    private void exportDB() { //exporta al archivo excel .csv
 
         File dbFile = getDatabasePath("registro_db.db");
         registroDbHelper dbhelper = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
@@ -282,7 +276,9 @@ public class MainActivity extends AppCompatActivity {
             file.createNewFile();
             CsvWriter csvWrite = new CsvWriter(new FileWriter(file));
             SQLiteDatabase db = dbhelper.getReadableDatabase();
+
             Cursor curCSV = db.rawQuery("SELECT * FROM registro", null);
+
             csvWrite.writeNext(curCSV.getColumnNames());
             while (curCSV.moveToNext()) {
                 //Which column you want to exprort
@@ -295,6 +291,7 @@ public class MainActivity extends AppCompatActivity {
             Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
         }
     }
+
 
 
 
@@ -502,8 +499,18 @@ public class MainActivity extends AppCompatActivity {
                 //db.agregar(message);
 
             }
+
+
             db.finalizaProceso();
-            db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
+            List<registro> consulta = db.ListadoGeneral();
+
+            if(consulta.toString() == message){
+                return "Este registro ya fue ingresado anteriormente.";
+            }
+            else {
+                db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
+                return "Registro guardado satisfactoriamente";
+            }
         } else {
             message += "nothing";
 
