@@ -21,8 +21,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
     private static final String TAG = "";
     public static int version = 2;
     public static String db_path = "/data/data/com.google.sample.cloudvision.BD/databases/";
-    public static String data_base = "registro_db.csv";
-
+    public static String data_base = "registro_db.db";
 
 
     private String INICIO_PROCESO = "Comienza el proceso";
@@ -101,10 +100,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
         values.put("TEXTO ", registro.getTexto());
         values.put("CALIDAD ", registro.getCalidad());
         return db.update(registroContract.registroEntry.table_name, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getIndice())});
-        }
-
-
-
+    }
 
 
     public void delete(registro registro) {
@@ -134,9 +130,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
-
-
-    public int getRegistro(){
+    public int getRegistro() {
         String countQuery = "SELECT * FROM " + registroContract.registroEntry.table_name;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
@@ -145,15 +139,13 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
-
     public void comenzarProceso() {
         System.out.println(INICIO_PROCESO);
         this.fechaInicio = new Date();
     }
 
 
-
-    public void finalizaProceso(){
+    public void finalizaProceso() {
 
         Date fechaFin = new Date();
         Long tiempoTranscurrido = fechaFin.getTime() - fechaInicio.getTime();
@@ -167,8 +159,9 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
-}
 
+
+}
 
 
 

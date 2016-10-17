@@ -12,7 +12,6 @@ import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -44,19 +43,11 @@ import com.google.api.services.vision.v1.model.Image;
 import com.google.sample.cloudvision.BD.registro;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -195,7 +186,6 @@ public class MainActivity extends AppCompatActivity {
                                 }
 
 
-
                             }
                         })
                         .setNegativeButton(R.string.dialog_select_camera, new DialogInterface.OnClickListener() {
@@ -228,6 +218,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
+
+
+
     public void backupDatabase(View view) throws IOException {
         if (Environment.getExternalStorageState() != null) {
             File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
@@ -238,94 +233,38 @@ public class MainActivity extends AppCompatActivity {
             }
 
             String fromPath = "";
-            if (Build.VERSION.SDK_INT >= 4.2) {
-                fromPath = getApplicationInfo().dataDir + "/databases/" + "registro_db.csv";
+            if (android.os.Build.VERSION.SDK_INT >= 4.2) {
+                fromPath = getApplicationInfo().dataDir + "/databases/" + "registro_db.db";
             } else {
-                fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.csv";
+                fromPath = "/data/data/" + getPackageName() + "/databases/" + "registro_db.db";
             }
 
-            String toPath = dir.getAbsolutePath() + "/registro_db.csv";
-
-            File tempFile = File.createTempFile(toPath,null);
-            BufferedWriter out = new BufferedWriter(new FileWriter(tempFile));
-            out.write(toPath);
-            tempFile.deleteOnExit();
-            out.close();
-
-            toPath = dir.getAbsolutePath() + "/registro_db.csv";
-
-            File fromPathDB = new File(fromPath);
-            File toPathDB = new File(toPath);
-            fileCopy(fromPathDB, toPathDB);
-            agregaContenidoArchivo(toPathDB, obtieneContenidoArchivo(fromPathDB));
+            File currentDB = getApplicationContext().getDatabasePath(fromPath);
 
 
-            //This is to refresh the folders in Windows USB conn.
-            MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
-            MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
-        }
-    }
+            String toPath = "/registro_db.db";
+            File backupDB = new File(dir, toPath);
+
+            if (currentDB.exists()) {
+                FileInputStream fis = new FileInputStream(currentDB);
+                FileOutputStream fos = new FileOutputStream(backupDB);
+                fos.getChannel().transferFrom(fis.getChannel(), 0, fis.getChannel().size());
+                // or fis.getChannel().transferTo(0, fis.getChannel().size(), fos.getChannel());
+                fis.close();
+                fos.close();
 
 
-    public void fileCopy(File src, File dst) throws IOException {
-        InputStream in = new FileInputStream(src);
-        OutputStream out = new FileOutputStream(dst);
-
-        byte[] buf = new byte[1024];
-        int len;
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
-        }
-        in.close();
-        out.close();
-    }
-
-
-    static public String obtieneContenidoArchivo(File archivoAbierto) {
-
-        StringBuilder contenido = new StringBuilder();
-
-        try {
-            BufferedReader entrada = new BufferedReader(new FileReader(archivoAbierto));
-            try {
-                String line = null;
-                while ((line = entrada.readLine()) != null) {
-                    contenido.append(line);
-                    contenido.append(System.getProperty("line.separator"));
-                }
-            } finally {
-                entrada.close();
+                //This is to refresh the folders in Windows USB conn.
+                MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp"}, null, null);
+                MediaScannerConnection.scanFile(this, new String[]{toPath}, null, null);
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        return contenido.toString();
-    }
-
-
-    static public void agregaContenidoArchivo(File archivoAbierto, String contenido)
-            throws FileNotFoundException, IOException {
-        if (archivoAbierto == null) {
-            throw new IllegalArgumentException("El archivo no debe ser nulo.");
-        }
-        if (!archivoAbierto.exists()) {
-            throw new FileNotFoundException("el archivo no existe: " + archivoAbierto);
-        }
-        if (!archivoAbierto.isFile()) {
-            throw new IllegalArgumentException("no debe ser un directorio: " + archivoAbierto);
-        }
-        if (!archivoAbierto.canWrite()) {
-            throw new IllegalArgumentException("El archivo no puede ser escrito: " + archivoAbierto);
-        }
-
-        Writer output = new BufferedWriter(new FileWriter(archivoAbierto));
-        try {
-            output.write(contenido);
-        } finally {
-            output.close();
         }
     }
+
+
+
+
+
 
 
     public void startGalleryChooser() {
