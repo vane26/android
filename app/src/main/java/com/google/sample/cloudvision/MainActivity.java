@@ -1,5 +1,5 @@
 /*
- * Created by Vane on 29/08/2016.
+ * Barrera
  */
 
 package com.google.sample.cloudvision;
