@@ -1,7 +1,6 @@
 /*
- *  Created by Vane on 29/08/2016.
+ * Created by Vane on 29/08/2016.
  */
-
 
 package com.google.sample.cloudvision;
 
@@ -503,15 +502,8 @@ public class MainActivity extends AppCompatActivity {
 
 
             db.finalizaProceso();
-            List<registro> consulta = db.ListadoGeneral();
+            db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
 
-            if(consulta.toString() == message){
-                return "Este registro ya fue ingresado anteriormente.";
-            }
-            else {
-                db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
-                return "Registro guardado satisfactoriamente";
-            }
         } else {
             message += "nothing";
 

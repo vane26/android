@@ -7,6 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,15 +57,23 @@ public class registroDbHelper extends SQLiteOpenHelper {
         if (db.isReadOnly()) {
             db = getWritableDatabase();
         }
+        try {
+            copyDataBase();
+        }catch (IOException e) {
+            throw new Error("Error copiando Base de Datos");
+        }
         db.execSQL(sqlCreate);
 
     }
 
 
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { //codigo en caso de querer crear mas campos en nuestra base de datos
-        if (newVersion > oldVersion) {
+        Log.i (TAG, "Actualización de la base de datos a la versión" + newVersion);
+        while (newVersion < oldVersion) {
             db.execSQL(sqlUpdate);
+            oldVersion ++;
         }
     }
 
@@ -138,6 +150,14 @@ public class registroDbHelper extends SQLiteOpenHelper {
         return cursor.getCount();
     }
 
+    public int getRegistroText() {
+        String countQuery = "SELECT TEXTO * FROM " + registroContract.registroEntry.table_name;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        cursor.close();
+        return cursor.getCount();
+    }
+
 
     public void comenzarProceso() {
         System.out.println(INICIO_PROCESO);
@@ -159,7 +179,29 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
+    private void copyDataBase() throws IOException {
+        //Abrimos el fichero de base de datos como entrada
+        //A través del contexto accedemos a la carpeta assets
+        InputStream myInput = myContext.getAssets().open(data_base);
 
+        //Ruta a la base de datos vacía recién creada
+        String outFileName = db_path + data_base;
+
+        //Abrimos la base de datos vacía como salida
+        OutputStream myOutput = new FileOutputStream(outFileName);
+
+        //Transferimos los bytes desde el fichero de entrada al de salida
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = myInput.read(buffer))>0){
+            myOutput.write(buffer, 0, length);
+        }
+
+        //Liberamos los streams
+        myOutput.flush();
+        myOutput.close();
+        myInput.close();
+    }
 
 
 }
