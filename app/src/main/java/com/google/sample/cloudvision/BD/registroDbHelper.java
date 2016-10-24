@@ -7,10 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,11 +52,6 @@ public class registroDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) { // codigo para crear base de datos
         if (db.isReadOnly()) {
             db = getWritableDatabase();
-        }
-        try {
-            copyDataBase();
-        }catch (IOException e) {
-            throw new Error("Error copiando Base de Datos");
         }
         db.execSQL(sqlCreate);
 
@@ -179,29 +170,6 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
-    private void copyDataBase() throws IOException {
-        //Abrimos el fichero de base de datos como entrada
-        //A través del contexto accedemos a la carpeta assets
-        InputStream myInput = myContext.getAssets().open(data_base);
-
-        //Ruta a la base de datos vacía recién creada
-        String outFileName = db_path + data_base;
-
-        //Abrimos la base de datos vacía como salida
-        OutputStream myOutput = new FileOutputStream(outFileName);
-
-        //Transferimos los bytes desde el fichero de entrada al de salida
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = myInput.read(buffer))>0){
-            myOutput.write(buffer, 0, length);
-        }
-
-        //Liberamos los streams
-        myOutput.flush();
-        myOutput.close();
-        myInput.close();
-    }
 
 
 }

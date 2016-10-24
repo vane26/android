@@ -35,11 +35,14 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.vision.v1.Vision;
 import com.google.api.services.vision.v1.VisionRequestInitializer;
 import com.google.api.services.vision.v1.model.AnnotateImageRequest;
+import com.google.api.services.vision.v1.model.AnnotateImageResponse;
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesRequest;
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
+import com.google.api.services.vision.v1.model.FaceAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
+import com.google.common.collect.ImmutableList;
 import com.google.sample.cloudvision.BD.registro;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
@@ -66,7 +69,13 @@ public class MainActivity extends AppCompatActivity {
     //private Button Guardar;
     EditText editIndice, editCalidad;
     TextView textView, textView1, textView4;
+    Vision vision;
     //CopiarArchivo copia;
+
+    private Bitmap mFaceBitmap;
+    private int mFaceWidth = 200;
+    private int mFaceHeight = 200;
+    private static final int MAX_FACES = 1;
 
 
     @Override
@@ -195,10 +204,10 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 startCamera();
                                 try {
-                                     backupDatabase(fab);
-                                 } catch (IOException e) {
-                                     e.printStackTrace();
-                                 }
+                                    backupDatabase(fab);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                                 exportDB();
 
 
@@ -219,7 +228,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
 
 
     public void backupDatabase(View view) throws IOException { //hace copia de respaldo .db
@@ -261,7 +269,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     private void exportDB() { //exporta al archivo excel .csv
 
         File dbFile = getDatabasePath("registro_db.db");
@@ -282,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
             csvWrite.writeNext(curCSV.getColumnNames());
             while (curCSV.moveToNext()) {
                 //Which column you want to exprort
-                String arrStr[] = {curCSV.getString(0), curCSV.getString(1), curCSV.getString(2),curCSV.getString(3)};
+                String arrStr[] = {curCSV.getString(0), curCSV.getString(1), curCSV.getString(2), curCSV.getString(3)};
                 csvWrite.writeNext(arrStr);
             }
             csvWrite.close();
@@ -291,8 +298,6 @@ public class MainActivity extends AppCompatActivity {
             Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
         }
     }
-
-
 
 
     public void startGalleryChooser() {
@@ -379,6 +384,7 @@ public class MainActivity extends AppCompatActivity {
                     HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
                     JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 
+
                     Vision.Builder builder = new Vision.Builder(httpTransport, jsonFactory, null);
                     builder.setVisionRequestInitializer(new
                             VisionRequestInitializer(CLOUD_VISION_API_KEY));
@@ -396,6 +402,12 @@ public class MainActivity extends AppCompatActivity {
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
                         byte[] imageBytes = byteArrayOutputStream.toByteArray();
+                        List<FaceAnnotation> resultados = detectFaces(imageBytes, 1);
+
+
+                  
+
+
 
                         // Base64 encode the JPEG
                         base64EncodedImage.encodeContent(imageBytes);
@@ -418,6 +430,12 @@ public class MainActivity extends AppCompatActivity {
                             landmarkDetection.setMaxResults(10);
                             add(landmarkDetection);
 
+                            Feature faceDetection = new Feature();
+                            faceDetection.setType("FACE_DETECTION");
+                            faceDetection.setMaxResults(10);
+                            add(faceDetection);
+
+
 
                         }});
 
@@ -432,7 +450,10 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "created Cloud Vision request object, sending request");
 
                     BatchAnnotateImagesResponse response = annotateRequest.execute();
+
+
                     return convertResponseToString(response);
+
 
                 } catch (GoogleJsonResponseException e) {
                     Log.d(TAG, "failed to make API request because " + e.getContent());
@@ -449,6 +470,54 @@ public class MainActivity extends AppCompatActivity {
             }
         }.execute();
     }
+
+    public List<FaceAnnotation> detectFaces(byte[] imagen, int maxResults) throws IOException {
+        AnnotateImageResponse response = null;
+        try {
+
+            HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
+            JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
+
+
+            Vision.Builder builder = new Vision.Builder(httpTransport, jsonFactory, null);
+            builder.setVisionRequestInitializer(new
+                    VisionRequestInitializer(CLOUD_VISION_API_KEY));
+            Vision vision = builder.build();
+            AnnotateImageRequest request =
+                    new AnnotateImageRequest()
+                            .setImage(new Image().encodeContent(imagen))
+                            .setFeatures(ImmutableList.of(
+                                    new Feature()
+                                            .setType("FACE_DETECTION")
+                                            .setMaxResults(maxResults)));
+            Vision.Images.Annotate annotate =
+                    vision.images()
+                            .annotate(new BatchAnnotateImagesRequest().setRequests(ImmutableList.of(request)));
+            // Due to a bug: requests to Vision API containing large images fail when GZipped.
+            annotate.setDisableGZipContent(true);
+
+            BatchAnnotateImagesResponse batchResponse = annotate.execute();
+            assert batchResponse.getResponses().size() == 1;
+            response = batchResponse.getResponses().get(0);
+            if (response.getFaceAnnotations() == null) {
+                throw new IOException(
+                        response.getError() != null
+                                ? response.getError().getMessage()
+                                : "Unknown error getting image annotations");
+            }
+
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response.getFaceAnnotations();
+    }
+
+
+
+
 
     public Bitmap scaleBitmapDown(Bitmap bitmap, int maxDimension) {
 
@@ -469,6 +538,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
     }
+
 
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
 
@@ -501,25 +571,35 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            db.finalizaProceso();
-            db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
-
-        } else {
-            message += "nothing";
-
-        }
+            try {
 
 
-        List<EntityAnnotation> landmarks = response.getResponses().get(0).getLandmarkAnnotations();
-        if (landmarks != null) {
-            for (EntityAnnotation landmark : landmarks) {
-                message += String.format("%.3f: %s", landmark.getScore(), landmark.getDescription());
-                message += "\n";
-                //registro reg = new registro(message);
-                //db.agregar(message);
+                List<registro> list = db.ListadoGeneral();
+
+                int cuenta = 0;
+
+                for (int i = 0; i < list.size(); i = (i + 1)) {
+                    if (list.get(i).getTexto().equals(message)) {
+                        cuenta++;
+                    }
+                }
+                if (cuenta == 0) {
+                    Toast.makeText(this, R.string.dialog_select_no_existe, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, R.string.dialog_select_existe, Toast.LENGTH_SHORT).show();
+                }
+
+                db.finalizaProceso();
+                db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
+
         } else {
             message += "nothing";
+
         }
 
 

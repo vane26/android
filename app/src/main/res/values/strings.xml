@@ -14,7 +14,8 @@
     <string name="dialog_select_grabar">Guardar</string>
     <string name="dialog_select_salir">Salir</string>
 
-
+    <string name="dialog_select_existe">Este usuario ya existe</string>
+    <string name="dialog_select_no_existe">Este usuario no existe</string>
 
 
 
