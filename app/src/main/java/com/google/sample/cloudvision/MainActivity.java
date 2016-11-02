@@ -12,7 +12,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -57,6 +59,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
     private static final String CLOUD_VISION_API_KEY = "AIzaSyAeBwFSno5fvo7D3tMgeHUEaD1Ur1-pMUI";
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int GALLERY_IMAGE_REQUEST = 1;
     public static final int CAMERA_PERMISSIONS_REQUEST = 2;
     public static final int CAMERA_IMAGE_REQUEST = 3;
+    private BatchAnnotateImagesResponse respuesta;
     registroDbHelper db;
     private TextView mImageDetails;
     private ImageView mMainImage;
@@ -73,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     EditText editIndice, editCalidad;
     TextView textView, textView1, textView4;
     CopiarArchivo copia;
+    private Canvas canvas;
 
 
     @Override
@@ -227,11 +232,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
-
     public void backupDatabase(View view) throws IOException {
         if (Environment.getExternalStorageState() != null) {
             File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
@@ -271,7 +271,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     private void exportDB() {
 
         File dbFile = getDatabasePath("registro_db.db");
@@ -290,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
             csvWrite.writeNext(curCSV.getColumnNames());
             while (curCSV.moveToNext()) {
                 //Which column you want to exprort
-                String arrStr[] = {curCSV.getString(0), curCSV.getString(1), curCSV.getString(2),curCSV.getString(3)};
+                String arrStr[] = {curCSV.getString(0), curCSV.getString(1), curCSV.getString(2), curCSV.getString(3)};
                 csvWrite.writeNext(arrStr);
             }
             csvWrite.close();
@@ -299,7 +298,6 @@ public class MainActivity extends AppCompatActivity {
             Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
         }
     }
-
 
 
     public void startGalleryChooser() {
@@ -361,8 +359,8 @@ public class MainActivity extends AppCompatActivity {
                                 1200);
 
                 callCloudVision(bitmap);
-                mMainImage.setImageBitmap(bitmap);
-
+                //mMainImage.setImageBitmap(bitmap);
+                reconocimiento(bitmap);
             } catch (IOException e) {
                 Log.d(TAG, "Image picking failed because " + e.getMessage());
                 Toast.makeText(this, R.string.image_picker_error, Toast.LENGTH_LONG).show();
@@ -378,117 +376,15 @@ public class MainActivity extends AppCompatActivity {
         // Switch text to loading
         mImageDetails.setText(R.string.loading_message);
         // Do the real work in an async task, because we need to use the network anyway
-        new AsyncTask<Object, Void, String>() {
-            @Override
-            protected String doInBackground(Object... params) {
-                try {
-
-                    HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
-                    JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
-
-                    Vision.Builder builder = new Vision.Builder(httpTransport, jsonFactory, null);
-                    builder.setVisionRequestInitializer(new
-                            VisionRequestInitializer(CLOUD_VISION_API_KEY));
-                    Vision vision = builder.build();
-
-                    BatchAnnotateImagesRequest batchAnnotateImagesRequest =
-                            new BatchAnnotateImagesRequest();
-                    batchAnnotateImagesRequest.setRequests(new ArrayList<AnnotateImageRequest>() {
-
-
-                        {
-                        AnnotateImageRequest annotateImageRequest = new AnnotateImageRequest();
-
-                        // Add the image
-                        Image base64EncodedImage = new Image();
-                        // Convert the bitmap to a JPEG
-                        // Just in case it's a format that Android understands but Cloud Vision
-                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
-                        byte[] imageBytes = byteArrayOutputStream.toByteArray();
-
-
-
-                        // Base64 encode the JPEG
-                        base64EncodedImage.encodeContent(imageBytes);
-                        annotateImageRequest.setImage(base64EncodedImage);
-
-                        // add the features we want
-                        annotateImageRequest.setFeatures(new ArrayList<Feature>() {{
-                            Feature labelDetection = new Feature();
-                            labelDetection.setType("LABEL_DETECTION");
-                            labelDetection.setMaxResults(10);
-                            add(labelDetection);
-
-                            Feature textDetection = new Feature();
-                            textDetection.setType("TEXT_DETECTION");
-                            textDetection.setMaxResults(10);
-                            add(textDetection);
-
-                            Feature landmarkDetection = new Feature();
-                            landmarkDetection.setType("LANDMARK_DETECTION");
-                            landmarkDetection.setMaxResults(10);
-                            add(landmarkDetection);
-
-
-                            Feature faceDetection = new Feature();
-                            faceDetection.setType("FACE_DETECTION");
-                            faceDetection.setMaxResults(1);
-                            add(faceDetection);
-
-
-                        }});
-
-
-                        // Add the list of one thing to the request
-                        add(annotateImageRequest);
-                    }});
-
-
-
-
-
-
-                    Vision.Images.Annotate annotateRequest =
-                            vision.images().annotate(batchAnnotateImagesRequest);
-                    // Due to a bug: requests to Vision API containing large images fail when GZipped.
-                    annotateRequest.setDisableGZipContent(true);
-                    Log.d(TAG, "created Cloud Vision request object, sending request");
-
-                    BatchAnnotateImagesResponse response = annotateRequest.execute();
-
-                    assert response.getResponses().size() == 1;
-                    if (reconocimiento(response) == null){
-                        throw new IOException(
-                                response.getError() != null
-                                        ? response.getError().getMessage()
-                                        : "Unknown error getting image annotations");
-                    }
-
-
-                    return convertResponseToString(response);
-
-
-
-
-
-                } catch (GoogleJsonResponseException e) {
-                    Log.d(TAG, "failed to make API request because " + e.getContent());
-                } catch (IOException e) {
-                    Log.d(TAG, "failed to make API request because of other IOException " +
-                            e.getMessage());
-                }
-                return "Cloud Vision API request failed. Check logs for details.";
-            }
-
-            protected void onPostExecute(String result) {
-                mImageDetails.setText(result);
-
-            }
-        }.execute();
+        CloudVision cloudVision= new CloudVision(bitmap);
+        try {
+            cloudVision.execute((Void)null).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
-
-
 
 
     public Bitmap scaleBitmapDown(Bitmap bitmap, int maxDimension) {
@@ -542,40 +438,32 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-
-              //  List<registro> list = db.ListadoTexto();
+            //  List<registro> list = db.ListadoTexto();
 
 
             Log.d(TAG, "paso");
-                try {
+            try {
 
 
-                    List<registro> list = db.ListadoGeneral();
+                List<registro> list = db.ListadoGeneral();
 
-                   // registro recuperar = db.recuperarRegistro();
-                   for (int i = 0; i < list.size();i++) {
-                       Log.d(TAG, "FOR");
-                       if (list.get(i).getTexto().equals(message)){
-                           Toast.makeText(this, "Rut no existe", Toast.LENGTH_LONG).show();
-                            Log.d(TAG, "if paso");
-                       }
-
-                        else {
-                            Toast.makeText(this, "Rut existe", Toast.LENGTH_SHORT).show();
-                            Log.d(TAG, "else paso");
-                        }
+                // registro recuperar = db.recuperarRegistro();
+                for (int i = 0; i < list.size(); i++) {
+                    Log.d(TAG, "FOR");
+                    if (list.get(i).getTexto().equals(message)) {
+                        Toast.makeText(this, "Rut no existe", Toast.LENGTH_LONG).show();
+                        Log.d(TAG, "if paso");
+                    } else {
+                        Toast.makeText(this, "Rut existe", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "else paso");
                     }
-
-                    db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
-                    db.finalizaProceso();
-                }
-                catch (Exception e){
-                    e.printStackTrace();
                 }
 
-
-
-
+                db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
+                db.finalizaProceso();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
 
         } else {
@@ -584,33 +472,129 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-
-
-
         return message;
 
 
     }
 
-    public Canvas reconocimiento(BatchAnnotateImagesResponse response){
-        Canvas canvas = new Canvas();
+    public void reconocimiento(Bitmap bitmap) {
+        Bitmap tempBitMap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.RGB_565);
+        Canvas canvas = new Canvas(tempBitMap);
         Paint paint = new Paint();
-
-        List<FaceAnnotation> faces = response.getResponses().get(0).getFaceAnnotations();
-        if (faces != null){
-            for(FaceAnnotation face : faces){
-                for(Landmark landmark : face.getLandmarks()){
-                    int x = (int) (landmark.getPosition().getX() * 200);
-                    int y = (int) (landmark.getPosition().getY() * 200);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(Color.RED);
+        canvas.drawBitmap(bitmap, 0, 0, null);
+        List<FaceAnnotation> faces = respuesta.getResponses().get(0).getFaceAnnotations();
+        if (faces != null) {
+            for (FaceAnnotation face : faces) {
+                for (Landmark landmark : face.getLandmarks()) {
+                    int x = (int) (landmark.getPosition().getX() * 100);
+                    int y = (int) (landmark.getPosition().getY() * 100);
                     canvas.drawCircle(x, y, 10, paint);
                 }
-
             }
         }
-
-        return canvas;
+        mMainImage.setImageDrawable(new BitmapDrawable(getResources(), tempBitMap));
     }
 
+    public class CloudVision extends AsyncTask<Void,Void,String>{
+        private Bitmap bitmap;
+
+        public CloudVision(Bitmap biimap) {
+            this.bitmap = biimap;
+        }
+        @Override
+        protected String doInBackground(Void... params) {
+            try {
+
+                HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
+                JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
+
+                Vision.Builder builder = new Vision.Builder(httpTransport, jsonFactory, null);
+                builder.setVisionRequestInitializer(new
+                        VisionRequestInitializer(CLOUD_VISION_API_KEY));
+                Vision vision = builder.build();
+
+                BatchAnnotateImagesRequest batchAnnotateImagesRequest =
+                        new BatchAnnotateImagesRequest();
+                batchAnnotateImagesRequest.setRequests(new ArrayList<AnnotateImageRequest>() {
 
 
+                    {
+                        AnnotateImageRequest annotateImageRequest = new AnnotateImageRequest();
+
+                        // Add the image
+                        Image base64EncodedImage = new Image();
+                        // Convert the bitmap to a JPEG
+                        // Just in case it's a format that Android understands but Cloud Vision
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
+                        byte[] imageBytes = byteArrayOutputStream.toByteArray();
+
+
+                        // Base64 encode the JPEG
+                        base64EncodedImage.encodeContent(imageBytes);
+                        annotateImageRequest.setImage(base64EncodedImage);
+
+                        // add the features we want
+                        annotateImageRequest.setFeatures(new ArrayList<Feature>() {{
+                            Feature labelDetection = new Feature();
+                            labelDetection.setType("LABEL_DETECTION");
+                            labelDetection.setMaxResults(10);
+                            add(labelDetection);
+
+                            Feature textDetection = new Feature();
+                            textDetection.setType("TEXT_DETECTION");
+                            textDetection.setMaxResults(10);
+                            add(textDetection);
+
+                            Feature landmarkDetection = new Feature();
+                            landmarkDetection.setType("LANDMARK_DETECTION");
+                            landmarkDetection.setMaxResults(10);
+                            add(landmarkDetection);
+
+                            Feature faceDetection = new Feature();
+                            faceDetection.setType("FACE_DETECTION");
+                            faceDetection.setMaxResults(10);
+                            add(faceDetection);
+
+
+                        }});
+
+
+                        // Add the list of one thing to the request
+                        add(annotateImageRequest);
+                    }
+                });
+
+
+                Vision.Images.Annotate annotateRequest =
+                        vision.images().annotate(batchAnnotateImagesRequest);
+                // Due to a bug: requests to Vision API containing large images fail when GZipped.
+                annotateRequest.setDisableGZipContent(true);
+                Log.d(TAG, "created Cloud Vision request object, sending request");
+
+                BatchAnnotateImagesResponse response = annotateRequest.execute();
+
+                respuesta = response;
+
+
+                return convertResponseToString(response);
+
+
+            } catch (GoogleJsonResponseException e) {
+                Log.d(TAG, "failed to make API request because " + e.getContent());
+            } catch (IOException e) {
+                Log.d(TAG, "failed to make API request because of other IOException " +
+                        e.getMessage());
+            }
+            return "Cloud Vision API request failed. Check logs for details.";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            mImageDetails.setText(s);
+        }
+    }
 }
