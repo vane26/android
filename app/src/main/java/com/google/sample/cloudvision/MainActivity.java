@@ -14,6 +14,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PointF;
+import android.graphics.RectF;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -48,6 +50,7 @@ import com.google.api.services.vision.v1.model.FaceAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 import com.google.api.services.vision.v1.model.Landmark;
+import com.google.api.services.vision.v1.model.Position;
 import com.google.sample.cloudvision.BD.registro;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
@@ -478,27 +481,71 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void reconocimiento(Bitmap bitmap) {
+
         Bitmap tempBitMap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(tempBitMap);
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5.0f);
         paint.setColor(Color.RED);
-        
+
+
         canvas.drawBitmap(bitmap, 0, 0, null);
         AnnotateImageResponse response=respuesta.getResponses().get(0);
         List<FaceAnnotation> faces = response.getFaceAnnotations();
+
         if (faces != null) {
             for (FaceAnnotation face : faces) {
-                for (Landmark landmark : face.getLandmarks()) {
-                    int x = (int) (landmark.getPosition().getX() * 100);
-                    int y = (int) (landmark.getPosition().getY() * 100);
-                    canvas.drawCircle(x, y, 10.0f, paint);
+                //drawRectangle(canvas,face.getPosition(),face.getWidth(),face.getHeight());
+                for(Landmark landmark:face.getLandmarks()){
+                    drawPoint(canvas,landmark.getPosition());
                 }
             }
         }
         mMainImage.setImageBitmap(tempBitMap);
     }
+
+
+    private void drawPoint(Canvas canvas, Position point){
+        Paint paint = new Paint();
+        paint.setColor(Color.RED);
+        paint.setStrokeWidth(8);
+        paint.setStyle(Paint.Style.STROKE);
+
+        float x = scaleX(point.getX());
+        float y = scaleY(point.getY());
+
+        canvas.drawCircle(x, y, 1, paint);
+    }
+
+    private void drawRectangle(Canvas canvas, PointF point, float width,
+                               float height){
+        Paint paint = new Paint();
+        paint.setColor(Color.RED);
+        paint.setStrokeWidth(5);
+        paint.setStyle(Paint.Style.STROKE);
+
+        float x1 = scaleX(point.x);
+        float y1 = scaleY(point.y);
+        float x2 = scaleX(point.x + width);
+        float y2 = scaleY(point.y + height);
+
+        RectF rect = new RectF(x1, y1, x2, y2);
+        canvas.drawRect(rect, paint);
+    }
+
+    public float scaleX(float horizontal) {
+        return horizontal * 1.0f;
+    }
+
+    public float scaleY(float vertical) {
+        return vertical * 1.0f;
+    }
+
+
+
+
+
 
 
 
