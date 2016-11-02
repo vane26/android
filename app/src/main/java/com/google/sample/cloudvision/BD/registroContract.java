@@ -9,6 +9,7 @@ public class registroContract {
      public static abstract class registroEntry implements BaseColumns {
         public static final String table_name = "registro";
 
+        //public static final int id = 0 ;
         public static final String indice = "indice";
         public static final String texto = "texto";
         public static final String calidad = "calidad";

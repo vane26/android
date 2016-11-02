@@ -4,6 +4,7 @@ package com.google.sample.cloudvision.BD;
  * Created by Vane on 31/08/2016.
  */
 public class registro {
+    private int id;
     private String indice;
     private String texto;
     private String calidad;
@@ -31,6 +32,11 @@ public class registro {
         this.calidad = calidad;
     }
 
+
+    public int getId(){
+        return id;
+    }
+
     public String getIndice() {
         return indice;
     }
@@ -44,6 +50,10 @@ public class registro {
     }
 
 
+
+    public void  setId(int id){
+        this.id = id;
+    }
     public void setIndice(String indice) {
         this.indice = indice;
     }

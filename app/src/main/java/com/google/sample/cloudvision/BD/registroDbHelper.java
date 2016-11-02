@@ -114,22 +114,74 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
     public List<registro> ListadoGeneral() {
         List<registro> listado = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + registroContract.registroEntry.table_name;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Log.d(TAG, "paso metodo");
+        String selectQuery = "SELECT texto FROM registro";
+        Log.d(TAG, "paso metodo1");
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        Log.d(TAG, "paso metodo2");
+
+     try {
+         if (cursor.moveToFirst()) {
+             do {
+                 registro registro = new registro();
+                 //registro.setId(Integer.parseInt(cursor.getString(0)));
+                 //registro.setIndice(cursor.getString(1));
+                 registro.setTexto(cursor.getString(2));
+                // registro.setCalidad(cursor.getString(3));
+                 listado.add(registro);
+                 Log.d(TAG, "paso metodo3");
+             } while (cursor.moveToNext());
+         }
+     }catch (Exception e){
+         Log.d("Base de datos", "Error al leer la base de datos");
+        }
+        return listado;
+    }
+
+
+    public List<registro> ListadoTexto() {
+        List<registro> listado = new ArrayList<>();
+
+        String selectQuery = "SELECT TEXTO * FROM " + registroContract.registroEntry.table_name;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-
+        Log.d(TAG, "paso metodo2");
         if (cursor.moveToFirst()) {
             do {
                 registro registro = new registro();
-                registro.setIndice(cursor.getString(0));
-                registro.setTexto(cursor.getString(1));
-                registro.setCalidad(cursor.getString(2));
+                registro.setId(cursor.getInt(0));
+                registro.setIndice(cursor.getString(1));
+                registro.setTexto(cursor.getString(2));
+                registro.setCalidad(cursor.getString(3));
                 listado.add(registro);
-
+                Log.d(TAG, "paso metodo3");
             } while (cursor.moveToNext());
         }
+        Log.d(TAG, "paso metodo4");
         return listado;
+    }
+
+    public registro recuperarRegistro() {
+        SQLiteDatabase db = getReadableDatabase();
+
+
+        String[] args = new String[] {"message"};
+        String selectQuery = "SELECT TEXTO * FROM " + registroContract.registroEntry.table_name+ "WHERE TEXTO=? " + args;
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if(c != null) {
+            c.moveToFirst();
+        }
+        registro registro = new registro();
+        registro.setTexto(c.getString(0));
+
+        c.close();
+        db.close();
+
+        return registro;
     }
 
 
