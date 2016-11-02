@@ -14,7 +14,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -41,6 +40,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.vision.v1.Vision;
 import com.google.api.services.vision.v1.VisionRequestInitializer;
 import com.google.api.services.vision.v1.model.AnnotateImageRequest;
+import com.google.api.services.vision.v1.model.AnnotateImageResponse;
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesRequest;
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     EditText editIndice, editCalidad;
     TextView textView, textView1, textView4;
     CopiarArchivo copia;
-    private Canvas canvas;
+    //private Canvas canvas;
 
 
     @Override
@@ -482,26 +482,32 @@ public class MainActivity extends AppCompatActivity {
         Canvas canvas = new Canvas(tempBitMap);
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5.0f);
         paint.setColor(Color.RED);
+        
         canvas.drawBitmap(bitmap, 0, 0, null);
-        List<FaceAnnotation> faces = respuesta.getResponses().get(0).getFaceAnnotations();
+        AnnotateImageResponse response=respuesta.getResponses().get(0);
+        List<FaceAnnotation> faces = response.getFaceAnnotations();
         if (faces != null) {
             for (FaceAnnotation face : faces) {
                 for (Landmark landmark : face.getLandmarks()) {
                     int x = (int) (landmark.getPosition().getX() * 100);
                     int y = (int) (landmark.getPosition().getY() * 100);
-                    canvas.drawCircle(x, y, 10, paint);
+                    canvas.drawCircle(x, y, 10.0f, paint);
                 }
             }
         }
-        mMainImage.setImageDrawable(new BitmapDrawable(getResources(), tempBitMap));
+        mMainImage.setImageBitmap(tempBitMap);
     }
+
+
+
 
     public class CloudVision extends AsyncTask<Void,Void,String>{
         private Bitmap bitmap;
 
-        public CloudVision(Bitmap biimap) {
-            this.bitmap = biimap;
+        public CloudVision(Bitmap bitmap) {
+            this.bitmap = bitmap;
         }
         @Override
         protected String doInBackground(Void... params) {
@@ -597,4 +603,7 @@ public class MainActivity extends AppCompatActivity {
             mImageDetails.setText(s);
         }
     }
+
+
+
 }
