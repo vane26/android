@@ -36,7 +36,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
     private static SQLiteDatabase.CursorFactory factory = null;
 
     String sqlCreate = "CREATE TABLE registro (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-            "indice TEXT, texto TEXT, calidad TEXT)";
+            "indice TEXT, texto TEXT, calidad TEXT, imagen TEXT)";
     String sqlUpdate = "ALTER TABLE registro ADD COLUMN indice TEXT";
 
 
@@ -83,37 +83,42 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
 
     //metodos insert, update, query
-    public void insert(registro registro) {
+    public void insert(Registro registro) {
         SQLiteDatabase db = this.getWritableDatabase();
         if (db != null) {
             ContentValues values = new ContentValues();
             values.put("INDICE ", registro.getIndice());
             values.put("TEXTO ", registro.getTexto());
             values.put("CALIDAD ", registro.getCalidad());
+            values.put("IMAGEN ", registro.getImagen());
             db.insert(registroContract.registroEntry.table_name, null, values);
         }
         db.close();
     }
 
 
-    public int update(registro registro) {
+
+
+
+    public int update(Registro registro) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("INDICE ", registro.getIndice());
         values.put("TEXTO ", registro.getTexto());
         values.put("CALIDAD ", registro.getCalidad());
+        values.put("IMAGEN ", registro.getImagen());
         return db.update(registroContract.registroEntry.table_name, values, "indice_cadena = ?", new String[]{String.valueOf(registro.getIndice())});
     }
 
 
-    public void delete(registro registro) {
+    public void delete(Registro registro) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(registroContract.registroEntry.table_name, registro.getIndice() + " = ?", new String[]{String.valueOf(registro.getIndice())});
     }
 
 
-    public List<registro> ListadoGeneral() {
-        List<registro> listado = new ArrayList<>();
+    public List<Registro> ListadoGeneral() {
+        List<Registro> listado = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
         Log.d(TAG, "paso metodo");
         String selectQuery = "SELECT texto FROM registro";
@@ -125,7 +130,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
      try {
          if (cursor.moveToFirst()) {
              do {
-                 registro registro = new registro();
+                 Registro registro = new Registro();
                  //registro.setId(Integer.parseInt(cursor.getString(0)));
                  //registro.setIndice(cursor.getString(1));
                  registro.setTexto(cursor.getString(2));
@@ -141,8 +146,8 @@ public class registroDbHelper extends SQLiteOpenHelper {
     }
 
 
-    public List<registro> ListadoTexto() {
-        List<registro> listado = new ArrayList<>();
+    public List<Registro> ListadoTexto() {
+        List<Registro> listado = new ArrayList<>();
 
         String selectQuery = "SELECT TEXTO * FROM " + registroContract.registroEntry.table_name;
 
@@ -151,11 +156,11 @@ public class registroDbHelper extends SQLiteOpenHelper {
         Log.d(TAG, "paso metodo2");
         if (cursor.moveToFirst()) {
             do {
-                registro registro = new registro();
-                registro.setId(cursor.getInt(0));
-                registro.setIndice(cursor.getString(1));
-                registro.setTexto(cursor.getString(2));
-                registro.setCalidad(cursor.getString(3));
+                Registro registro = new Registro();
+                registro.setIndice(cursor.getString(0));
+                registro.setTexto(cursor.getString(1));
+                registro.setCalidad(cursor.getString(2));
+                registro.setImagen(cursor.getString(3));
                 listado.add(registro);
                 Log.d(TAG, "paso metodo3");
             } while (cursor.moveToNext());
@@ -164,7 +169,33 @@ public class registroDbHelper extends SQLiteOpenHelper {
         return listado;
     }
 
-    public registro recuperarRegistro() {
+
+    public List<Registro> ListadoImagen() {
+        List<Registro> listado = new ArrayList<>();
+
+        String selectQuery = "SELECT IMAGEN * FROM " + registroContract.registroEntry.table_name;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Registro registro = new Registro();
+                registro.setIndice(cursor.getString(0));
+                registro.setTexto(cursor.getString(1));
+                registro.setCalidad(cursor.getString(2));
+                registro.setImagen(cursor.getString(3));
+                listado.add(registro);
+            } while (cursor.moveToNext());
+        }
+
+        return listado;
+    }
+
+
+
+
+    public Registro recuperarRegistro() {
         SQLiteDatabase db = getReadableDatabase();
 
 
@@ -175,7 +206,7 @@ public class registroDbHelper extends SQLiteOpenHelper {
         if(c != null) {
             c.moveToFirst();
         }
-        registro registro = new registro();
+        Registro registro = new Registro();
         registro.setTexto(c.getString(0));
 
         c.close();
@@ -219,7 +250,9 @@ public class registroDbHelper extends SQLiteOpenHelper {
 
         DecimalFormat df = new DecimalFormat(FORMATO_DOS_DIGITOS);
         System.out.println(String.format(FIN_PROCESO, df.format(diffHours), df.format(diffMinutes), df.format(diffSeconds)));
+
     }
+
 
 
 

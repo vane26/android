@@ -51,7 +51,8 @@ import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 import com.google.api.services.vision.v1.model.Landmark;
 import com.google.api.services.vision.v1.model.Position;
-import com.google.sample.cloudvision.BD.registro;
+import com.google.gson.Gson;
+import com.google.sample.cloudvision.BD.Registro;
 import com.google.sample.cloudvision.BD.registroDbHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -94,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
         db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
         //db.getWritableDatabase(); //accion a realizar, lectura o escritura.
         db.comenzarProceso();
-
         //Grabar = (Button) findViewById(R.id.button);
         editIndice = (EditText) findViewById(R.id.editText);
         editIndice.setVisibility(View.INVISIBLE);
@@ -292,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
             csvWrite.writeNext(curCSV.getColumnNames());
             while (curCSV.moveToNext()) {
                 //Which column you want to exprort
-                String arrStr[] = {curCSV.getString(0), curCSV.getString(1), curCSV.getString(2), curCSV.getString(3)};
+                String arrStr[] = {curCSV.getString(0), curCSV.getString(1), curCSV.getString(2), curCSV.getString(3), curCSV.getString(4)};
                 csvWrite.writeNext(arrStr);
             }
             csvWrite.close();
@@ -444,25 +444,35 @@ public class MainActivity extends AppCompatActivity {
             //  List<registro> list = db.ListadoTexto();
 
 
-            Log.d(TAG, "paso");
+
             try {
+                List<Registro> list = db.ListadoGeneral();
 
-
-                List<registro> list = db.ListadoGeneral();
-
-                // registro recuperar = db.recuperarRegistro();
+                //registro recuperar = db.recuperarRegistro();
                 for (int i = 0; i < list.size(); i++) {
                     Log.d(TAG, "FOR");
-                    if (list.get(i).getTexto().equals(message)) {
-                        Toast.makeText(this, "Rut no existe", Toast.LENGTH_LONG).show();
-                        Log.d(TAG, "if paso");
-                    } else {
-                        Toast.makeText(this, "Rut existe", Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, "else paso");
+                     if(message.compareTo(list.get(i).getTexto()) == 0){
+                            Toast.makeText(this, "Rut no existe", Toast.LENGTH_LONG).show();
+                            Log.d(TAG, "if paso");
+                        }
+                      else {
+                            Toast.makeText(this, "Rut existe", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "else paso");
                     }
                 }
 
-                db.insert(new registro(editIndice.getText().toString(), message, editCalidad.getText().toString()));
+                AnnotateImageResponse annotateImageResponse=response.getResponses().get(0);
+                List<FaceAnnotation> faceAnnotations=annotateImageResponse.getFaceAnnotations();
+
+                Gson gson =  new Gson();
+                String json = gson.toJson(faceAnnotations);
+
+                //Validar String json ----> metodo en contruccion
+                
+
+                db.insert(new Registro(editIndice.getText().toString(), message, editCalidad.getText().toString(), json));
+
+
                 db.finalizaProceso();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -503,6 +513,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         mMainImage.setImageBitmap(tempBitMap);
+
     }
 
 
@@ -546,10 +557,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
-
-
     public class CloudVision extends AsyncTask<Void,Void,String>{
         private Bitmap bitmap;
 
@@ -563,10 +570,17 @@ public class MainActivity extends AppCompatActivity {
                 HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
                 JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 
+
                 Vision.Builder builder = new Vision.Builder(httpTransport, jsonFactory, null);
                 builder.setVisionRequestInitializer(new
                         VisionRequestInitializer(CLOUD_VISION_API_KEY));
                 Vision vision = builder.build();
+
+                //Gson resultado = new Gson();
+              //  Registro registro = (Registro) resultado.fromJson(String.valueOf(jsonFactory), Registro.class);
+               // Log.d(TAG, registro.getImagen());
+
+
 
                 BatchAnnotateImagesRequest batchAnnotateImagesRequest =
                         new BatchAnnotateImagesRequest();
@@ -612,6 +626,7 @@ public class MainActivity extends AppCompatActivity {
                             add(faceDetection);
 
 
+
                         }});
 
 
@@ -630,6 +645,10 @@ public class MainActivity extends AppCompatActivity {
                 BatchAnnotateImagesResponse response = annotateRequest.execute();
 
                 respuesta = response;
+
+
+
+                //System.out.print(json);
 
 
                 return convertResponseToString(response);

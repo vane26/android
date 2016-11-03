@@ -3,34 +3,33 @@ package com.google.sample.cloudvision.BD;
 /**
  * Created by Vane on 31/08/2016.
  */
-public class registro {
+public class Registro {
     private int id;
     private String indice;
     private String texto;
     private String calidad;
+    private String imagen;
 
-    public registro(String indice, String texto, String calidad) {
+    public Registro(String indice, String texto, String calidad, String imagen) {
         this.indice = indice;
         this.texto = texto;
         this.calidad = calidad;
+        this.imagen = imagen;
 
 
     }
 
-    public registro() {
+    public Registro() {
 
     }
 
 
-    public registro(String texto) {
-        this.texto = texto;
-    }
-
-
-    public registro(String indice, String calidad){
+    public Registro(String indice, String calidad){
         this.indice = indice;
         this.calidad = calidad;
     }
+
+
 
 
     public int getId(){
@@ -45,11 +44,16 @@ public class registro {
         return texto;
     }
 
+
+
+
     public String getCalidad() {
         return calidad;
     }
 
-
+    public String getImagen(){
+        return imagen;
+    }
 
     public void  setId(int id){
         this.id = id;
@@ -66,8 +70,9 @@ public class registro {
         this.calidad = calidad;
     }
 
-
-
+    public void setImagen(String imagen){
+        this.imagen = imagen;
+    }
 }
 
 
