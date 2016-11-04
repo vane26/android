@@ -5,8 +5,8 @@ import android.provider.BaseColumns;
 /**
  * Created by Vane on 31/08/2016.
  */
-public class registroContract {
-     public static abstract class registroEntry implements BaseColumns {
+public class RegistroContract {
+     public static abstract class RegistroEntry implements BaseColumns {
         public static final String table_name = "registro";
 
         //public static final int id = 0 ;

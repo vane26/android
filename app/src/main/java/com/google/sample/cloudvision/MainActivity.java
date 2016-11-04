@@ -53,7 +53,7 @@ import com.google.api.services.vision.v1.model.Landmark;
 import com.google.api.services.vision.v1.model.Position;
 import com.google.gson.Gson;
 import com.google.sample.cloudvision.BD.Registro;
-import com.google.sample.cloudvision.BD.registroDbHelper;
+import com.google.sample.cloudvision.BD.RegistroDbHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int CAMERA_PERMISSIONS_REQUEST = 2;
     public static final int CAMERA_IMAGE_REQUEST = 3;
     private BatchAnnotateImagesResponse respuesta;
-    registroDbHelper db;
+    RegistroDbHelper db;
     private TextView mImageDetails;
     private ImageView mMainImage;
     public Context myContext;
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        db = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
+        db = new RegistroDbHelper(this, RegistroDbHelper.data_base, null, RegistroDbHelper.version);
         //db.getWritableDatabase(); //accion a realizar, lectura o escritura.
         db.comenzarProceso();
         //Grabar = (Button) findViewById(R.id.button);
@@ -277,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
     private void exportDB() {
 
         File dbFile = getDatabasePath("registro_db.db");
-        registroDbHelper dbhelper = new registroDbHelper(this, registroDbHelper.data_base, null, registroDbHelper.version);
+        RegistroDbHelper dbhelper = new RegistroDbHelper(this, RegistroDbHelper.data_base, null, RegistroDbHelper.version);
         File exportDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MyApp");
         if (!exportDir.exists()) {
             exportDir.mkdirs();
@@ -441,25 +441,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            //  List<registro> list = db.ListadoTexto();
+
 
 
 
             try {
-                List<Registro> list = db.ListadoGeneral();
 
-                //registro recuperar = db.recuperarRegistro();
-                for (int i = 0; i < list.size(); i++) {
-                    Log.d(TAG, "FOR");
-                     if(message.compareTo(list.get(i).getTexto()) == 0){
-                            Toast.makeText(this, "Rut no existe", Toast.LENGTH_LONG).show();
-                            Log.d(TAG, "if paso");
-                        }
-                      else {
-                            Toast.makeText(this, "Rut existe", Toast.LENGTH_SHORT).show();
-                            Log.d(TAG, "else paso");
-                    }
-                }
+
 
                 AnnotateImageResponse annotateImageResponse=response.getResponses().get(0);
                 List<FaceAnnotation> faceAnnotations=annotateImageResponse.getFaceAnnotations();
@@ -467,10 +455,32 @@ public class MainActivity extends AppCompatActivity {
                 Gson gson =  new Gson();
                 String json = gson.toJson(faceAnnotations);
 
-                //Validar String json ----> metodo en contruccion
-                
+
+
 
                 db.insert(new Registro(editIndice.getText().toString(), message, editCalidad.getText().toString(), json));
+
+
+
+                List<Registro> list = db.ListadoGeneral();
+                String[] array = new String[list.size()];
+                int index = 0;
+                for (Object value : list) {
+                    array[index] = (String) value;
+                    index++;
+
+                    for (int i = 0; i < array[index].length(); i++) {
+                        Log.d(TAG, "FOR");
+                        if ((array[index].equals(message)) && (array[index].equals(json))) {
+                            Toast.makeText(this, "No registra información en nuestra base de datos", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(this, "Registra información en nuestra base de datos", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+
+
+
 
 
                 db.finalizaProceso();
@@ -490,6 +500,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
+
+
+
+
+
+
+
     public void reconocimiento(Bitmap bitmap) {
 
         Bitmap tempBitMap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.RGB_565);
@@ -506,7 +525,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (faces != null) {
             for (FaceAnnotation face : faces) {
-                //drawRectangle(canvas,face.getPosition(),face.getWidth(),face.getHeight());
+               // drawRectangle(canvas,face.getPosition(),face.getWidth(),face.getHeight());
                 for(Landmark landmark:face.getLandmarks()){
                     drawPoint(canvas,landmark.getPosition());
                 }
