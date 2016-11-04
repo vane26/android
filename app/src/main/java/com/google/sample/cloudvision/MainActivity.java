@@ -462,6 +462,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+                
                 List<Registro> list = db.ListadoGeneral();
                 String[] array = new String[list.size()];
                 int index = 0;
